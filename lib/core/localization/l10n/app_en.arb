@@ -1,0 +1,84 @@
+{
+  "@@locale": "en",
+  "appName": "Chatbox",
+  "@appName": {
+    "description": "The name of the application"
+  },
+  "splashAppName": "Chatbox",
+  "@splashAppName": {
+    "description": "App name displayed on splash screen"
+  },
+  "onboardingHeadline": "Connect\nfriends\neasily &\nquickly",
+  "@onboardingHeadline": {
+    "description": "Main headline on onboarding screen"
+  },
+  "onboardingDescription": "Our chat app is the perfect way to stay\nconnected with friends and family.",
+  "@onboardingDescription": {
+    "description": "Description text on onboarding screen"
+  },
+  "signUpWithMail": "Sign up with mail",
+  "@signUpWithMail": {
+    "description": "Button text for email sign up"
+  },
+  "existingAccount": "Existing account? ",
+  "@existingAccount": {
+    "description": "Text before login link"
+  },
+  "logIn": "Log in",
+  "@logIn": {
+    "description": "Login link text"
+  },
+  "loginTitle": "Log in to Chatbox",
+  "@loginTitle": {
+    "description": "Title on login screen"
+  },
+  "loginWelcome": "Welcome back! Sign in using your social account or email to continue us.",
+  "@loginWelcome": {
+    "description": "Welcome message on login screen"
+  },
+  "yourEmail": "Your email",
+  "@yourEmail": {
+    "description": "Email input field label"
+  },
+  "password": "Password",
+  "@password": {
+    "description": "Password input field label"
+  },
+  "loginButton": "Log in",
+  "@loginButton": {
+    "description": "Login button text"
+  },
+  "forgotPassword": "Forgot password?",
+  "@forgotPassword": {
+    "description": "Forgot password link text"
+  },
+  "signUpTitle": "Sign up with Email",
+  "@signUpTitle": {
+    "description": "Title on sign up screen"
+  },
+  "signUpDescription": "Get chatting with friends and family today by signing up for our chat app!",
+  "@signUpDescription": {
+    "description": "Description on sign up screen"
+  },
+  "yourName": "Your name",
+  "@yourName": {
+    "description": "Name input field label"
+  },
+  "confirmPassword": "Confirm Password",
+  "@confirmPassword": {
+    "description": "Confirm password input field label"
+  },
+  "createAccount": "Create an account",
+  "@createAccount": {
+    "description": "Sign up button text"
+  },
+  "invalidEmail": "Invalid email address",
+  "@invalidEmail": {
+    "description": "Email validation error message"
+  },
+  "or": "OR",
+  "@or": {
+    "description": "Separator text between social login and email login"
+  }
+}
+
