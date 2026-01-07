@@ -1,9 +1,9 @@
 class AppStrings {
   // App Name
-  static const String appName = 'Chatbox';
+  static const String appName = 'Spam Detection';
   
   // Splash Screen
-  static const String splashAppName = 'Chatbox';
+  static const String splashAppName = 'Spam Detection';
   
   // Onboarding Screen
   static const String onboardingHeadline = 'Connect\nfriends\neasily &\nquickly';

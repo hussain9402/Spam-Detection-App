@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
-import '../widgets/gradient_background.dart';
 // import '../widgets/social_login_button.dart'; // COMMENTED OUT - social login disabled
 import '../controllers/auth_controller.dart';
 // import '../../../core/routes/app_routes.dart'; // COMMENTED OUT - not used when social login is disabled
@@ -14,10 +13,9 @@ class OnboardingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final AuthController authController = Get.find<AuthController>();
     
-    return GradientBackground(
-      child: SafeArea(
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           body: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: Column(
@@ -25,34 +23,33 @@ class OnboardingScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const Spacer(flex: 2),
-                // App Branding
-                const Text(
-                  'C',
-                  style: TextStyle(
-                    fontSize: 48,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textWhite,
-                  ),
+                // App Logo
+                Image.asset(
+                  'assets/icons/app_logo_full.png',
+                  width: 120,
+                  height: 120,
+                  fit: BoxFit.contain,
                 ),
-                const SizedBox(height: 8),
-                const Text(
+                const SizedBox(height: 16),
+                // App Name
+                Text(
                   AppStrings.appName,
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textWhite,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontStyle: FontStyle.italic,
                   ),
                 ),
                 const SizedBox(height: 48),
                 // Headline
-                const Text(
+                Text(
                   AppStrings.onboardingHeadline,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textWhite,
+                    color: Theme.of(context).colorScheme.onSurface,
                     height: 1.2,
                   ),
                 ),
@@ -63,7 +60,7 @@ class OnboardingScreen extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 16,
-                    color: AppColors.textWhite.withOpacity(0.9),
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
                     height: 1.5,
                   ),
                 ),
@@ -174,8 +171,8 @@ class OnboardingScreen extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: () => authController.navigateToSignup(),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.textWhite,
-                      foregroundColor: AppColors.textBlack,
+                      backgroundColor: AppColors.primaryTeal,
+                      foregroundColor: AppColors.textWhite,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -198,16 +195,16 @@ class OnboardingScreen extends StatelessWidget {
                     Text(
                       AppStrings.existingAccount,
                       style: TextStyle(
-                        color: AppColors.textWhite.withOpacity(0.9),
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
                         fontSize: 14,
                       ),
                     ),
                     GestureDetector(
                       onTap: () => authController.navigateToLogin(),
-                      child: const Text(
+                      child: Text(
                         AppStrings.logIn,
                         style: TextStyle(
-                          color: AppColors.textWhite,
+                          color: AppColors.primaryTeal,
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                         ),
@@ -220,7 +217,6 @@ class OnboardingScreen extends StatelessWidget {
             ),
           ),
         ),
-      ),
     );
   }
 }

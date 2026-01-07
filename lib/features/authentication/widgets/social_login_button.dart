@@ -33,7 +33,7 @@ class SocialLoginButton extends StatelessWidget {
           ),
         ),
         child: Center(
-          child: _getIcon(),
+          child: _getIcon(context),
         ),
       ),
     );
@@ -50,7 +50,7 @@ class SocialLoginButton extends StatelessWidget {
     }
   }
   
-  Widget _getIcon() {
+  Widget _getIcon(BuildContext context) {
     switch (provider) {
       case SocialProvider.facebook:
         return const Text(
@@ -63,10 +63,10 @@ class SocialLoginButton extends StatelessWidget {
           ),
         );
       case SocialProvider.google:
-        return const Text(
+        return Text(
           'G',
           style: TextStyle(
-            color: AppColors.textBlack,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 20,
             fontWeight: FontWeight.bold,
             fontFamily: 'Arial',

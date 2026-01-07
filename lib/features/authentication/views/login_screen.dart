@@ -18,12 +18,12 @@ class LoginScreen extends StatelessWidget {
     final passwordController = TextEditingController();
     
     return Scaffold(
-      backgroundColor: AppColors.backgroundWhite,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.textBlack),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Get.back(),
         ),
       ),
@@ -36,10 +36,10 @@ class LoginScreen extends StatelessWidget {
             // Title with underline
             RichText(
               text: TextSpan(
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textBlack,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
                 children: [
                   WidgetSpan(
@@ -52,12 +52,12 @@ class LoginScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                      child: const Text(
+                      child: Text(
                         'Log in',
                         style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.textBlack,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                     ),
@@ -70,9 +70,9 @@ class LoginScreen extends StatelessWidget {
             // Welcome message
             Text(
               AppStrings.loginWelcome,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
-                color: AppColors.textGray,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                 height: 1.5,
               ),
             ),

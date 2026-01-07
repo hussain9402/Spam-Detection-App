@@ -108,7 +108,7 @@ class SignUpController extends GetxController {
         );
       } else {
         // Success - navigation handled by auth state listener
-        Get.offAllNamed(AppRoutes.home);
+        Get.offAllNamed(AppRoutes.mainNavigation);
       }
     }
   }

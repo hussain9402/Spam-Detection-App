@@ -19,12 +19,12 @@ class SignUpScreen extends StatelessWidget {
     final confirmPasswordController = TextEditingController();
     
     return Scaffold(
-      backgroundColor: AppColors.backgroundWhite,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.textBlack),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Get.back(),
         ),
       ),
@@ -37,10 +37,10 @@ class SignUpScreen extends StatelessWidget {
             // Title with underline
             RichText(
               text: TextSpan(
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textBlack,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
                 children: [
                   const TextSpan(text: 'Sign up with '),
@@ -54,12 +54,12 @@ class SignUpScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                      child: const Text(
+                      child: Text(
                         'Email',
                         style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.textBlack,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                     ),
@@ -71,9 +71,9 @@ class SignUpScreen extends StatelessWidget {
             // Description
             Text(
               AppStrings.signUpDescription,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
-                color: AppColors.textGray,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                 height: 1.5,
               ),
             ),

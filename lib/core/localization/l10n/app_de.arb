@@ -1,0 +1,212 @@
+{
+  "@@locale": "de",
+  "appName": "Spam-Erkennung",
+  "@appName": {
+    "description": "The name of the application"
+  },
+  "splashAppName": "Spam-Erkennung",
+  "@splashAppName": {
+    "description": "App name displayed on splash screen"
+  },
+  "onboardingHeadline": "Verbinde\nFreunde\neinfach &\nschnell",
+  "@onboardingHeadline": {
+    "description": "Main headline on onboarding screen"
+  },
+  "onboardingDescription": "Unsere Chat-App ist die perfekte Möglichkeit, mit Freunden und Familie in Verbindung zu bleiben.",
+  "@onboardingDescription": {
+    "description": "Description text on onboarding screen"
+  },
+  "signUpWithMail": "Mit E-Mail registrieren",
+  "@signUpWithMail": {
+    "description": "Button text for email sign up"
+  },
+  "existingAccount": "Bereits ein Konto? ",
+  "@existingAccount": {
+    "description": "Text before login link"
+  },
+  "logIn": "Anmelden",
+  "@logIn": {
+    "description": "Login link text"
+  },
+  "loginTitle": "Bei Chatbox anmelden",
+  "@loginTitle": {
+    "description": "Title on login screen"
+  },
+  "loginWelcome": "Willkommen zurück! Melden Sie sich mit Ihrem Social-Media-Konto oder Ihrer E-Mail an, um fortzufahren.",
+  "@loginWelcome": {
+    "description": "Welcome message on login screen"
+  },
+  "yourEmail": "Ihre E-Mail",
+  "@yourEmail": {
+    "description": "Email input field label"
+  },
+  "password": "Passwort",
+  "@password": {
+    "description": "Password input field label"
+  },
+  "loginButton": "Anmelden",
+  "@loginButton": {
+    "description": "Login button text"
+  },
+  "forgotPassword": "Passwort vergessen?",
+  "@forgotPassword": {
+    "description": "Forgot password link text"
+  },
+  "signUpTitle": "Mit E-Mail registrieren",
+  "@signUpTitle": {
+    "description": "Title on sign up screen"
+  },
+  "signUpDescription": "Beginnen Sie noch heute mit dem Chatten mit Freunden und Familie, indem Sie sich für unsere Chat-App registrieren!",
+  "@signUpDescription": {
+    "description": "Description on sign up screen"
+  },
+  "yourName": "Ihr Name",
+  "@yourName": {
+    "description": "Name input field label"
+  },
+  "confirmPassword": "Passwort bestätigen",
+  "@confirmPassword": {
+    "description": "Confirm password input field label"
+  },
+  "createAccount": "Konto erstellen",
+  "@createAccount": {
+    "description": "Sign up button text"
+  },
+  "invalidEmail": "Ungültige E-Mail-Adresse",
+  "@invalidEmail": {
+    "description": "Email validation error message"
+  },
+  "or": "ODER",
+  "@or": {
+    "description": "Separator text between social login and email login"
+  },
+  "home": "Startseite",
+  "@home": {
+    "description": "Home screen title"
+  },
+  "calls": "Anrufe",
+  "@calls": {
+    "description": "Calls screen title"
+  },
+  "contacts": "Kontakte",
+  "@contacts": {
+    "description": "Contacts screen title"
+  },
+  "settings": "Einstellungen",
+  "@settings": {
+    "description": "Settings screen title"
+  },
+  "message": "Nachricht",
+  "@message": {
+    "description": "Message tab label in bottom navigation"
+  },
+  "recent": "Letzte",
+  "@recent": {
+    "description": "Recent calls section title"
+  },
+  "myContact": "Meine Kontakte",
+  "@myContact": {
+    "description": "My Contact section title"
+  },
+  "activeNow": "Jetzt aktiv",
+  "@activeNow": {
+    "description": "Active status text in chat header"
+  },
+  "today": "Heute",
+  "@today": {
+    "description": "Today date separator"
+  },
+  "writeYourMessage": "Schreiben Sie Ihre Nachricht",
+  "@writeYourMessage": {
+    "description": "Message input placeholder text"
+  },
+  "displayName": "Anzeigename",
+  "@displayName": {
+    "description": "Display name label in profile"
+  },
+  "emailAddress": "E-Mail-Adresse",
+  "@emailAddress": {
+    "description": "Email address label in profile"
+  },
+  "address": "Adresse",
+  "@address": {
+    "description": "Address label in profile"
+  },
+  "phoneNumber": "Telefonnummer",
+  "@phoneNumber": {
+    "description": "Phone number label in profile"
+  },
+  "mediaShared": "Geteilte Medien",
+  "@mediaShared": {
+    "description": "Media shared section title"
+  },
+  "viewAll": "Alle anzeigen",
+  "@viewAll": {
+    "description": "View all button text"
+  },
+  "account": "Konto",
+  "@account": {
+    "description": "Account settings option"
+  },
+  "accountSubtitle": "Datenschutz, Sicherheit, Nummer ändern",
+  "@accountSubtitle": {
+    "description": "Account settings subtitle"
+  },
+  "chat": "Chat",
+  "@chat": {
+    "description": "Chat settings option"
+  },
+  "chatSubtitle": "Chat-Verlauf, Theme, Hintergrundbilder",
+  "@chatSubtitle": {
+    "description": "Chat settings subtitle"
+  },
+  "notifications": "Benachrichtigungen",
+  "@notifications": {
+    "description": "Notifications settings option"
+  },
+  "notificationsSubtitle": "Nachrichten, Gruppen und andere",
+  "@notificationsSubtitle": {
+    "description": "Notifications settings subtitle"
+  },
+  "help": "Hilfe",
+  "@help": {
+    "description": "Help settings option"
+  },
+  "helpSubtitle": "Hilfezentrum, Kontakt, Datenschutzerklärung",
+  "@helpSubtitle": {
+    "description": "Help settings subtitle"
+  },
+  "appTheme": "App-Design",
+  "@appTheme": {
+    "description": "App Theme settings option"
+  },
+  "lightTheme": "Hell",
+  "@lightTheme": {
+    "description": "Light theme option"
+  },
+  "darkTheme": "Dunkel",
+  "@darkTheme": {
+    "description": "Dark theme option"
+  },
+  "systemTheme": "Systemstandard",
+  "@systemTheme": {
+    "description": "System default theme option"
+  },
+  "inviteAFriend": "Einen Freund einladen",
+  "@inviteAFriend": {
+    "description": "Invite a friend settings option"
+  },
+  "logout": "Abmelden",
+  "@logout": {
+    "description": "Logout button text"
+  },
+  "neverGiveUp": "Gib niemals auf 💪",
+  "@neverGiveUp": {
+    "description": "Default status message"
+  },
+  "appLanguage": "App-Sprache",
+  "@appLanguage": {
+    "description": "App Language settings option"
+  }
+}
+

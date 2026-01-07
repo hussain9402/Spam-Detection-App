@@ -1,0 +1,212 @@
+{
+  "@@locale": "es",
+  "appName": "Detección de Spam",
+  "@appName": {
+    "description": "The name of the application"
+  },
+  "splashAppName": "Detección de Spam",
+  "@splashAppName": {
+    "description": "App name displayed on splash screen"
+  },
+  "onboardingHeadline": "Conecta\namigos\nfácil y\nrápidamente",
+  "@onboardingHeadline": {
+    "description": "Main headline on onboarding screen"
+  },
+  "onboardingDescription": "Nuestra aplicación de chat es la forma perfecta de mantenerse conectado con amigos y familiares.",
+  "@onboardingDescription": {
+    "description": "Description text on onboarding screen"
+  },
+  "signUpWithMail": "Registrarse con correo",
+  "@signUpWithMail": {
+    "description": "Button text for email sign up"
+  },
+  "existingAccount": "¿Ya tienes una cuenta? ",
+  "@existingAccount": {
+    "description": "Text before login link"
+  },
+  "logIn": "Iniciar sesión",
+  "@logIn": {
+    "description": "Login link text"
+  },
+  "loginTitle": "Iniciar sesión en Chatbox",
+  "@loginTitle": {
+    "description": "Title on login screen"
+  },
+  "loginWelcome": "¡Bienvenido de nuevo! Inicia sesión con tu cuenta social o correo electrónico para continuar.",
+  "@loginWelcome": {
+    "description": "Welcome message on login screen"
+  },
+  "yourEmail": "Tu correo electrónico",
+  "@yourEmail": {
+    "description": "Email input field label"
+  },
+  "password": "Contraseña",
+  "@password": {
+    "description": "Password input field label"
+  },
+  "loginButton": "Iniciar sesión",
+  "@loginButton": {
+    "description": "Login button text"
+  },
+  "forgotPassword": "¿Olvidaste tu contraseña?",
+  "@forgotPassword": {
+    "description": "Forgot password link text"
+  },
+  "signUpTitle": "Registrarse con correo electrónico",
+  "@signUpTitle": {
+    "description": "Title on sign up screen"
+  },
+  "signUpDescription": "¡Comienza a chatear con amigos y familiares hoy registrándote en nuestra aplicación de chat!",
+  "@signUpDescription": {
+    "description": "Description on sign up screen"
+  },
+  "yourName": "Tu nombre",
+  "@yourName": {
+    "description": "Name input field label"
+  },
+  "confirmPassword": "Confirmar contraseña",
+  "@confirmPassword": {
+    "description": "Confirm password input field label"
+  },
+  "createAccount": "Crear una cuenta",
+  "@createAccount": {
+    "description": "Sign up button text"
+  },
+  "invalidEmail": "Dirección de correo electrónico inválida",
+  "@invalidEmail": {
+    "description": "Email validation error message"
+  },
+  "or": "O",
+  "@or": {
+    "description": "Separator text between social login and email login"
+  },
+  "home": "Inicio",
+  "@home": {
+    "description": "Home screen title"
+  },
+  "calls": "Llamadas",
+  "@calls": {
+    "description": "Calls screen title"
+  },
+  "contacts": "Contactos",
+  "@contacts": {
+    "description": "Contacts screen title"
+  },
+  "settings": "Configuración",
+  "@settings": {
+    "description": "Settings screen title"
+  },
+  "message": "Mensaje",
+  "@message": {
+    "description": "Message tab label in bottom navigation"
+  },
+  "recent": "Recientes",
+  "@recent": {
+    "description": "Recent calls section title"
+  },
+  "myContact": "Mis contactos",
+  "@myContact": {
+    "description": "My Contact section title"
+  },
+  "activeNow": "En línea ahora",
+  "@activeNow": {
+    "description": "Active status text in chat header"
+  },
+  "today": "Hoy",
+  "@today": {
+    "description": "Today date separator"
+  },
+  "writeYourMessage": "Escribe tu mensaje",
+  "@writeYourMessage": {
+    "description": "Message input placeholder text"
+  },
+  "displayName": "Nombre para mostrar",
+  "@displayName": {
+    "description": "Display name label in profile"
+  },
+  "emailAddress": "Dirección de correo electrónico",
+  "@emailAddress": {
+    "description": "Email address label in profile"
+  },
+  "address": "Dirección",
+  "@address": {
+    "description": "Address label in profile"
+  },
+  "phoneNumber": "Número de teléfono",
+  "@phoneNumber": {
+    "description": "Phone number label in profile"
+  },
+  "mediaShared": "Medios compartidos",
+  "@mediaShared": {
+    "description": "Media shared section title"
+  },
+  "viewAll": "Ver todo",
+  "@viewAll": {
+    "description": "View all button text"
+  },
+  "account": "Cuenta",
+  "@account": {
+    "description": "Account settings option"
+  },
+  "accountSubtitle": "Privacidad, seguridad, cambiar número",
+  "@accountSubtitle": {
+    "description": "Account settings subtitle"
+  },
+  "chat": "Chat",
+  "@chat": {
+    "description": "Chat settings option"
+  },
+  "chatSubtitle": "Historial de chat, tema, fondos de pantalla",
+  "@chatSubtitle": {
+    "description": "Chat settings subtitle"
+  },
+  "notifications": "Notificaciones",
+  "@notifications": {
+    "description": "Notifications settings option"
+  },
+  "notificationsSubtitle": "Mensajes, grupos y otros",
+  "@notificationsSubtitle": {
+    "description": "Notifications settings subtitle"
+  },
+  "help": "Ayuda",
+  "@help": {
+    "description": "Help settings option"
+  },
+  "helpSubtitle": "Centro de ayuda, contáctanos, política de privacidad",
+  "@helpSubtitle": {
+    "description": "Help settings subtitle"
+  },
+  "appTheme": "Tema de la aplicación",
+  "@appTheme": {
+    "description": "App Theme settings option"
+  },
+  "lightTheme": "Claro",
+  "@lightTheme": {
+    "description": "Light theme option"
+  },
+  "darkTheme": "Oscuro",
+  "@darkTheme": {
+    "description": "Dark theme option"
+  },
+  "systemTheme": "Predeterminado del sistema",
+  "@systemTheme": {
+    "description": "System default theme option"
+  },
+  "inviteAFriend": "Invitar a un amigo",
+  "@inviteAFriend": {
+    "description": "Invite a friend settings option"
+  },
+  "logout": "Cerrar sesión",
+  "@logout": {
+    "description": "Logout button text"
+  },
+  "neverGiveUp": "Nunca te rindas 💪",
+  "@neverGiveUp": {
+    "description": "Default status message"
+  },
+  "appLanguage": "Idioma de la aplicación",
+  "@appLanguage": {
+    "description": "App Language settings option"
+  }
+}
+

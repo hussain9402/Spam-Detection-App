@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../constants/app_colors.dart';
 
 class DarkTheme {
@@ -7,16 +8,24 @@ class DarkTheme {
       useMaterial3: true,
       brightness: Brightness.dark,
       primaryColor: AppColors.primaryTeal,
-      scaffoldBackgroundColor: AppColors.backgroundDark,
+      scaffoldBackgroundColor: AppColors.backgroundDark, // #121212
+      // Set status bar style to light icons (white)
+      appBarTheme: const AppBarTheme(
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.light, // Light icons (white)
+          statusBarBrightness: Brightness.dark, // For iOS
+        ),
+      ),
       colorScheme: ColorScheme.dark(
         primary: AppColors.primaryTeal,
         secondary: AppColors.primaryTeal,
         error: AppColors.errorRed,
-        surface: AppColors.backgroundDark,
+        surface: AppColors.backgroundDarkSurface, // #1E1E1E for surfaces
         onPrimary: AppColors.textWhite,
         onSecondary: AppColors.textWhite,
         onError: AppColors.textWhite,
-        onSurface: AppColors.textWhite,
+        onSurface: AppColors.textWhite, // Keep white for text on dark surfaces
       ),
       textTheme: const TextTheme(
         displayLarge: TextStyle(
@@ -64,7 +73,7 @@ class DarkTheme {
           fontWeight: FontWeight.w500,
         ),
         enabledBorder: const UnderlineInputBorder(
-          borderSide: BorderSide(color: AppColors.borderGray),
+          borderSide: BorderSide(color: AppColors.borderDark),
         ),
         focusedBorder: const UnderlineInputBorder(
           borderSide: BorderSide(color: AppColors.primaryTeal, width: 2),
@@ -99,6 +108,18 @@ class DarkTheme {
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ),
+        ),
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: AppColors.backgroundDarkSurface, // #1E1E1E
+        titleTextStyle: const TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+          color: AppColors.textWhite,
+        ),
+        contentTextStyle: const TextStyle(
+          fontSize: 16,
+          color: AppColors.textWhite,
         ),
       ),
     );

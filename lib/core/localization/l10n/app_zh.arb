@@ -1,0 +1,212 @@
+{
+  "@@locale": "zh",
+  "appName": "垃圾邮件检测",
+  "@appName": {
+    "description": "The name of the application"
+  },
+  "splashAppName": "垃圾邮件检测",
+  "@splashAppName": {
+    "description": "App name displayed on splash screen"
+  },
+  "onboardingHeadline": "轻松快速地\n连接\n朋友",
+  "@onboardingHeadline": {
+    "description": "Main headline on onboarding screen"
+  },
+  "onboardingDescription": "我们的聊天应用是与朋友和家人保持联系的最佳方式。",
+  "@onboardingDescription": {
+    "description": "Description text on onboarding screen"
+  },
+  "signUpWithMail": "使用邮箱注册",
+  "@signUpWithMail": {
+    "description": "Button text for email sign up"
+  },
+  "existingAccount": "已有账户？ ",
+  "@existingAccount": {
+    "description": "Text before login link"
+  },
+  "logIn": "登录",
+  "@logIn": {
+    "description": "Login link text"
+  },
+  "loginTitle": "登录聊天框",
+  "@loginTitle": {
+    "description": "Title on login screen"
+  },
+  "loginWelcome": "欢迎回来！使用您的社交账户或邮箱登录以继续。",
+  "@loginWelcome": {
+    "description": "Welcome message on login screen"
+  },
+  "yourEmail": "您的邮箱",
+  "@yourEmail": {
+    "description": "Email input field label"
+  },
+  "password": "密码",
+  "@password": {
+    "description": "Password input field label"
+  },
+  "loginButton": "登录",
+  "@loginButton": {
+    "description": "Login button text"
+  },
+  "forgotPassword": "忘记密码？",
+  "@forgotPassword": {
+    "description": "Forgot password link text"
+  },
+  "signUpTitle": "使用邮箱注册",
+  "@signUpTitle": {
+    "description": "Title on sign up screen"
+  },
+  "signUpDescription": "立即注册我们的聊天应用，今天就开始与朋友和家人聊天！",
+  "@signUpDescription": {
+    "description": "Description on sign up screen"
+  },
+  "yourName": "您的姓名",
+  "@yourName": {
+    "description": "Name input field label"
+  },
+  "confirmPassword": "确认密码",
+  "@confirmPassword": {
+    "description": "Confirm password input field label"
+  },
+  "createAccount": "创建账户",
+  "@createAccount": {
+    "description": "Sign up button text"
+  },
+  "invalidEmail": "无效的邮箱地址",
+  "@invalidEmail": {
+    "description": "Email validation error message"
+  },
+  "or": "或",
+  "@or": {
+    "description": "Separator text between social login and email login"
+  },
+  "home": "首页",
+  "@home": {
+    "description": "Home screen title"
+  },
+  "calls": "通话",
+  "@calls": {
+    "description": "Calls screen title"
+  },
+  "contacts": "联系人",
+  "@contacts": {
+    "description": "Contacts screen title"
+  },
+  "settings": "设置",
+  "@settings": {
+    "description": "Settings screen title"
+  },
+  "message": "消息",
+  "@message": {
+    "description": "Message tab label in bottom navigation"
+  },
+  "recent": "最近",
+  "@recent": {
+    "description": "Recent calls section title"
+  },
+  "myContact": "我的联系人",
+  "@myContact": {
+    "description": "My Contact section title"
+  },
+  "activeNow": "现在在线",
+  "@activeNow": {
+    "description": "Active status text in chat header"
+  },
+  "today": "今天",
+  "@today": {
+    "description": "Today date separator"
+  },
+  "writeYourMessage": "输入您的消息",
+  "@writeYourMessage": {
+    "description": "Message input placeholder text"
+  },
+  "displayName": "显示名称",
+  "@displayName": {
+    "description": "Display name label in profile"
+  },
+  "emailAddress": "邮箱地址",
+  "@emailAddress": {
+    "description": "Email address label in profile"
+  },
+  "address": "地址",
+  "@address": {
+    "description": "Address label in profile"
+  },
+  "phoneNumber": "电话号码",
+  "@phoneNumber": {
+    "description": "Phone number label in profile"
+  },
+  "mediaShared": "共享的媒体",
+  "@mediaShared": {
+    "description": "Media shared section title"
+  },
+  "viewAll": "查看全部",
+  "@viewAll": {
+    "description": "View all button text"
+  },
+  "account": "账户",
+  "@account": {
+    "description": "Account settings option"
+  },
+  "accountSubtitle": "隐私，安全，更改号码",
+  "@accountSubtitle": {
+    "description": "Account settings subtitle"
+  },
+  "chat": "聊天",
+  "@chat": {
+    "description": "Chat settings option"
+  },
+  "chatSubtitle": "聊天历史，主题，壁纸",
+  "@chatSubtitle": {
+    "description": "Chat settings subtitle"
+  },
+  "notifications": "通知",
+  "@notifications": {
+    "description": "Notifications settings option"
+  },
+  "notificationsSubtitle": "消息，群组和其他",
+  "@notificationsSubtitle": {
+    "description": "Notifications settings subtitle"
+  },
+  "help": "帮助",
+  "@help": {
+    "description": "Help settings option"
+  },
+  "helpSubtitle": "帮助中心，联系我们，隐私政策",
+  "@helpSubtitle": {
+    "description": "Help settings subtitle"
+  },
+  "appTheme": "应用主题",
+  "@appTheme": {
+    "description": "App Theme settings option"
+  },
+  "lightTheme": "浅色",
+  "@lightTheme": {
+    "description": "Light theme option"
+  },
+  "darkTheme": "深色",
+  "@darkTheme": {
+    "description": "Dark theme option"
+  },
+  "systemTheme": "系统默认",
+  "@systemTheme": {
+    "description": "System default theme option"
+  },
+  "inviteAFriend": "邀请朋友",
+  "@inviteAFriend": {
+    "description": "Invite a friend settings option"
+  },
+  "logout": "退出登录",
+  "@logout": {
+    "description": "Logout button text"
+  },
+  "neverGiveUp": "永不放弃 💪",
+  "@neverGiveUp": {
+    "description": "Default status message"
+  },
+  "appLanguage": "应用语言",
+  "@appLanguage": {
+    "description": "App Language settings option"
+  }
+}
+

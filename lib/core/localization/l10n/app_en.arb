@@ -1,10 +1,10 @@
 {
   "@@locale": "en",
-  "appName": "Chatbox",
+  "appName": "Spam Detection",
   "@appName": {
     "description": "The name of the application"
   },
-  "splashAppName": "Chatbox",
+  "splashAppName": "Spam Detection",
   "@splashAppName": {
     "description": "App name displayed on splash screen"
   },
@@ -79,6 +79,134 @@
   "or": "OR",
   "@or": {
     "description": "Separator text between social login and email login"
+  },
+  "home": "Home",
+  "@home": {
+    "description": "Home screen title"
+  },
+  "calls": "Calls",
+  "@calls": {
+    "description": "Calls screen title"
+  },
+  "contacts": "Contacts",
+  "@contacts": {
+    "description": "Contacts screen title"
+  },
+  "settings": "Settings",
+  "@settings": {
+    "description": "Settings screen title"
+  },
+  "message": "Message",
+  "@message": {
+    "description": "Message tab label in bottom navigation"
+  },
+  "recent": "Recent",
+  "@recent": {
+    "description": "Recent calls section title"
+  },
+  "myContact": "My Contact",
+  "@myContact": {
+    "description": "My Contact section title"
+  },
+  "activeNow": "Active now",
+  "@activeNow": {
+    "description": "Active status text in chat header"
+  },
+  "today": "Today",
+  "@today": {
+    "description": "Today date separator"
+  },
+  "writeYourMessage": "Write your message",
+  "@writeYourMessage": {
+    "description": "Message input placeholder text"
+  },
+  "displayName": "Display Name",
+  "@displayName": {
+    "description": "Display name label in profile"
+  },
+  "emailAddress": "Email Address",
+  "@emailAddress": {
+    "description": "Email address label in profile"
+  },
+  "address": "Address",
+  "@address": {
+    "description": "Address label in profile"
+  },
+  "phoneNumber": "Phone Number",
+  "@phoneNumber": {
+    "description": "Phone number label in profile"
+  },
+  "mediaShared": "Media Shared",
+  "@mediaShared": {
+    "description": "Media shared section title"
+  },
+  "viewAll": "View All",
+  "@viewAll": {
+    "description": "View all button text"
+  },
+  "account": "Account",
+  "@account": {
+    "description": "Account settings option"
+  },
+  "accountSubtitle": "Privacy, security, change number",
+  "@accountSubtitle": {
+    "description": "Account settings subtitle"
+  },
+  "chat": "Chat",
+  "@chat": {
+    "description": "Chat settings option"
+  },
+  "chatSubtitle": "Chat history, theme, wallpapers",
+  "@chatSubtitle": {
+    "description": "Chat settings subtitle"
+  },
+  "notifications": "Notifications",
+  "@notifications": {
+    "description": "Notifications settings option"
+  },
+  "notificationsSubtitle": "Messages, group and others",
+  "@notificationsSubtitle": {
+    "description": "Notifications settings subtitle"
+  },
+  "help": "Help",
+  "@help": {
+    "description": "Help settings option"
+  },
+  "helpSubtitle": "Help center, contact us, privacy policy",
+  "@helpSubtitle": {
+    "description": "Help settings subtitle"
+  },
+  "appTheme": "App Theme",
+  "@appTheme": {
+    "description": "App Theme settings option"
+  },
+  "lightTheme": "Light",
+  "@lightTheme": {
+    "description": "Light theme option"
+  },
+  "darkTheme": "Dark",
+  "@darkTheme": {
+    "description": "Dark theme option"
+  },
+  "systemTheme": "System Default",
+  "@systemTheme": {
+    "description": "System default theme option"
+  },
+  "inviteAFriend": "Invite a friend",
+  "@inviteAFriend": {
+    "description": "Invite a friend settings option"
+  },
+  "logout": "Logout",
+  "@logout": {
+    "description": "Logout button text"
+  },
+  "neverGiveUp": "Never give up 💪",
+  "@neverGiveUp": {
+    "description": "Default status message"
+  },
+  "appLanguage": "App Language",
+  "@appLanguage": {
+    "description": "App Language settings option"
   }
 }
 

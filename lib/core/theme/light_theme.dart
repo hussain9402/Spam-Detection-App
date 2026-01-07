@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../constants/app_colors.dart';
 
 class LightTheme {
@@ -8,6 +9,14 @@ class LightTheme {
       brightness: Brightness.light,
       primaryColor: AppColors.primaryTeal,
       scaffoldBackgroundColor: AppColors.backgroundWhite,
+      // Set status bar style to light icons (white)
+      appBarTheme: const AppBarTheme(
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.light, // Light icons (white)
+          statusBarBrightness: Brightness.dark, // For iOS
+        ),
+      ),
       colorScheme: ColorScheme.light(
         primary: AppColors.primaryTeal,
         secondary: AppColors.primaryTeal,
@@ -99,6 +108,18 @@ class LightTheme {
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ),
+        ),
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: AppColors.backgroundWhite,
+        titleTextStyle: const TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+          color: AppColors.textBlack,
+        ),
+        contentTextStyle: const TextStyle(
+          fontSize: 16,
+          color: AppColors.textBlack,
         ),
       ),
     );

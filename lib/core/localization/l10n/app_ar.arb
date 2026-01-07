@@ -1,0 +1,212 @@
+{
+  "@@locale": "ar",
+  "appName": "كشف الرسائل غير المرغوب فيها",
+  "@appName": {
+    "description": "The name of the application"
+  },
+  "splashAppName": "كشف الرسائل غير المرغوب فيها",
+  "@splashAppName": {
+    "description": "App name displayed on splash screen"
+  },
+  "onboardingHeadline": "تواصل مع\nالأصدقاء\nبسهولة\nوسرعة",
+  "@onboardingHeadline": {
+    "description": "Main headline on onboarding screen"
+  },
+  "onboardingDescription": "تطبيق الدردشة الخاص بنا هو الطريقة المثالية للبقاء على اتصال مع الأصدقاء والعائلة.",
+  "@onboardingDescription": {
+    "description": "Description text on onboarding screen"
+  },
+  "signUpWithMail": "سجل بالبريد الإلكتروني",
+  "@signUpWithMail": {
+    "description": "Button text for email sign up"
+  },
+  "existingAccount": "هل لديك حساب؟ ",
+  "@existingAccount": {
+    "description": "Text before login link"
+  },
+  "logIn": "تسجيل الدخول",
+  "@logIn": {
+    "description": "Login link text"
+  },
+  "loginTitle": "تسجيل الدخول إلى صندوق الدردشة",
+  "@loginTitle": {
+    "description": "Title on login screen"
+  },
+  "loginWelcome": "مرحبًا بعودتك! سجل الدخول باستخدام حسابك الاجتماعي أو البريد الإلكتروني للمتابعة.",
+  "@loginWelcome": {
+    "description": "Welcome message on login screen"
+  },
+  "yourEmail": "بريدك الإلكتروني",
+  "@yourEmail": {
+    "description": "Email input field label"
+  },
+  "password": "كلمة المرور",
+  "@password": {
+    "description": "Password input field label"
+  },
+  "loginButton": "تسجيل الدخول",
+  "@loginButton": {
+    "description": "Login button text"
+  },
+  "forgotPassword": "نسيت كلمة المرور؟",
+  "@forgotPassword": {
+    "description": "Forgot password link text"
+  },
+  "signUpTitle": "سجل بالبريد الإلكتروني",
+  "@signUpTitle": {
+    "description": "Title on sign up screen"
+  },
+  "signUpDescription": "ابدأ الدردشة مع الأصدقاء والعائلة اليوم من خلال التسجيل في تطبيق الدردشة الخاص بنا!",
+  "@signUpDescription": {
+    "description": "Description on sign up screen"
+  },
+  "yourName": "اسمك",
+  "@yourName": {
+    "description": "Name input field label"
+  },
+  "confirmPassword": "تأكيد كلمة المرور",
+  "@confirmPassword": {
+    "description": "Confirm password input field label"
+  },
+  "createAccount": "إنشاء حساب",
+  "@createAccount": {
+    "description": "Sign up button text"
+  },
+  "invalidEmail": "عنوان بريد إلكتروني غير صالح",
+  "@invalidEmail": {
+    "description": "Email validation error message"
+  },
+  "or": "أو",
+  "@or": {
+    "description": "Separator text between social login and email login"
+  },
+  "home": "الرئيسية",
+  "@home": {
+    "description": "Home screen title"
+  },
+  "calls": "المكالمات",
+  "@calls": {
+    "description": "Calls screen title"
+  },
+  "contacts": "جهات الاتصال",
+  "@contacts": {
+    "description": "Contacts screen title"
+  },
+  "settings": "الإعدادات",
+  "@settings": {
+    "description": "Settings screen title"
+  },
+  "message": "الرسالة",
+  "@message": {
+    "description": "Message tab label in bottom navigation"
+  },
+  "recent": "حديث",
+  "@recent": {
+    "description": "Recent calls section title"
+  },
+  "myContact": "جهات الاتصال الخاصة بي",
+  "@myContact": {
+    "description": "My Contact section title"
+  },
+  "activeNow": "نشط الآن",
+  "@activeNow": {
+    "description": "Active status text in chat header"
+  },
+  "today": "اليوم",
+  "@today": {
+    "description": "Today date separator"
+  },
+  "writeYourMessage": "اكتب رسالتك",
+  "@writeYourMessage": {
+    "description": "Message input placeholder text"
+  },
+  "displayName": "اسم العرض",
+  "@displayName": {
+    "description": "Display name label in profile"
+  },
+  "emailAddress": "عنوان البريد الإلكتروني",
+  "@emailAddress": {
+    "description": "Email address label in profile"
+  },
+  "address": "العنوان",
+  "@address": {
+    "description": "Address label in profile"
+  },
+  "phoneNumber": "رقم الهاتف",
+  "@phoneNumber": {
+    "description": "Phone number label in profile"
+  },
+  "mediaShared": "الوسائط المشتركة",
+  "@mediaShared": {
+    "description": "Media shared section title"
+  },
+  "viewAll": "عرض الكل",
+  "@viewAll": {
+    "description": "View all button text"
+  },
+  "account": "الحساب",
+  "@account": {
+    "description": "Account settings option"
+  },
+  "accountSubtitle": "الخصوصية، الأمان، تغيير الرقم",
+  "@accountSubtitle": {
+    "description": "Account settings subtitle"
+  },
+  "chat": "الدردشة",
+  "@chat": {
+    "description": "Chat settings option"
+  },
+  "chatSubtitle": "سجل الدردشة، المظهر، الخلفيات",
+  "@chatSubtitle": {
+    "description": "Chat settings subtitle"
+  },
+  "notifications": "الإشعارات",
+  "@notifications": {
+    "description": "Notifications settings option"
+  },
+  "notificationsSubtitle": "الرسائل، المجموعات وأخرى",
+  "@notificationsSubtitle": {
+    "description": "Notifications settings subtitle"
+  },
+  "help": "المساعدة",
+  "@help": {
+    "description": "Help settings option"
+  },
+  "helpSubtitle": "مركز المساعدة، اتصل بنا، سياسة الخصوصية",
+  "@helpSubtitle": {
+    "description": "Help settings subtitle"
+  },
+  "appTheme": "مظهر التطبيق",
+  "@appTheme": {
+    "description": "App Theme settings option"
+  },
+  "lightTheme": "فاتح",
+  "@lightTheme": {
+    "description": "Light theme option"
+  },
+  "darkTheme": "داكن",
+  "@darkTheme": {
+    "description": "Dark theme option"
+  },
+  "systemTheme": "افتراضي النظام",
+  "@systemTheme": {
+    "description": "System default theme option"
+  },
+  "inviteAFriend": "دعوة صديق",
+  "@inviteAFriend": {
+    "description": "Invite a friend settings option"
+  },
+  "logout": "تسجيل الخروج",
+  "@logout": {
+    "description": "Logout button text"
+  },
+  "neverGiveUp": "لا تستسلم أبدًا 💪",
+  "@neverGiveUp": {
+    "description": "Default status message"
+  },
+  "appLanguage": "لغة التطبيق",
+  "@appLanguage": {
+    "description": "App Language settings option"
+  }
+}
+
