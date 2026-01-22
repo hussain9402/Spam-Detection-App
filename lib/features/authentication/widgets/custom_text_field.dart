@@ -33,7 +33,7 @@ class CustomTextField extends StatelessWidget {
         Text(
           label,
           style: TextStyle(
-            color: hasError ? AppColors.errorRed : AppColors.primaryTeal,
+            color: hasError ? AppColors.errorRed : AppColors.textWhite,
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ),

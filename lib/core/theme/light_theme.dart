@@ -25,7 +25,7 @@ class LightTheme {
         onPrimary: AppColors.textWhite,
         onSecondary: AppColors.textWhite,
         onError: AppColors.textWhite,
-        onSurface: AppColors.textBlack,
+        onSurface: AppColors.textWhite,
       ),
       textTheme: const TextTheme(
         displayLarge: TextStyle(

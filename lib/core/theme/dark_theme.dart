@@ -21,7 +21,7 @@ class DarkTheme {
         primary: AppColors.primaryTeal,
         secondary: AppColors.primaryTeal,
         error: AppColors.errorRed,
-        surface: AppColors.backgroundDarkSurface, // #1E1E1E for surfaces
+        surface: AppColors.textWhite, // #1E1E1E for surfaces
         onPrimary: AppColors.textWhite,
         onSecondary: AppColors.textWhite,
         onError: AppColors.textWhite,
@@ -68,7 +68,7 @@ class DarkTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         labelStyle: const TextStyle(
-          color: AppColors.primaryTeal,
+          color: AppColors.textWhite,
           fontSize: 14,
           fontWeight: FontWeight.w500,
         ),

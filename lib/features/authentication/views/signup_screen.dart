@@ -8,23 +8,28 @@ import '../controllers/auth_controller.dart';
 
 class SignUpScreen extends StatelessWidget {
   const SignUpScreen({super.key});
-  
+
   @override
   Widget build(BuildContext context) {
     final SignUpController controller = Get.put(SignUpController());
     final AuthController authController = Get.find<AuthController>();
+
     final nameController = TextEditingController();
     final emailController = TextEditingController();
+    final phoneController = TextEditingController();
     final passwordController = TextEditingController();
     final confirmPasswordController = TextEditingController();
-    
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
+          icon: Icon(
+            Icons.arrow_back,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
           onPressed: () => Get.back(),
         ),
       ),
@@ -34,7 +39,8 @@ class SignUpScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 32),
-            // Title with underline
+
+            // -------- Title --------
             RichText(
               text: TextSpan(
                 style: TextStyle(
@@ -59,7 +65,8 @@ class SignUpScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.onSurface,
+                          color:
+                              Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                     ),
@@ -67,78 +74,122 @@ class SignUpScreen extends StatelessWidget {
                 ],
               ),
             ),
+
             const SizedBox(height: 16),
-            // Description
+
+            // -------- Description --------
             Text(
               AppStrings.signUpDescription,
               style: TextStyle(
                 fontSize: 14,
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withOpacity(0.7),
                 height: 1.5,
               ),
             ),
+
             const SizedBox(height: 32),
-            // Name Field
+
+            // -------- Name --------
             Obx(() => CustomTextField(
-              label: AppStrings.yourName,
-              controller: nameController,
-              errorText: controller.nameError.value.isEmpty ? null : controller.nameError.value,
-              onChanged: (value) => controller.validateName(value),
-            )),
+                  label: AppStrings.yourName,
+                  
+                  controller: nameController,
+                  errorText: controller.nameError.value.isEmpty
+                      ? null
+                      : controller.nameError.value,
+                  onChanged: controller.validateName,
+                )),
+
             const SizedBox(height: 24),
-            // Email Field with real-time validation
+
+            // -------- Email --------
             Obx(() => CustomTextField(
-              label: AppStrings.yourEmail,
-              keyboardType: TextInputType.emailAddress,
-              controller: emailController,
-              errorText: controller.emailError.value.isEmpty ? null : controller.emailError.value,
-              onChanged: (value) => controller.validateEmail(value),
-            )),
+                  label: AppStrings.yourEmail,
+                  keyboardType: TextInputType.emailAddress,
+                  controller: emailController,
+                  errorText: controller.emailError.value.isEmpty
+                      ? null
+                      : controller.emailError.value,
+                  onChanged: controller.validateEmail,
+                )),
+
             const SizedBox(height: 24),
-            // Password Field
+
+            // -------- Phone Number --------
             Obx(() => CustomTextField(
-              label: AppStrings.password,
-              obscureText: true,
-              controller: passwordController,
-              errorText: controller.passwordError.value.isEmpty ? null : controller.passwordError.value,
-              onChanged: (value) => controller.validatePassword(value),
-            )),
+                  label: 'Phone Number',
+                  hintText: '+923001234567',
+                  keyboardType: TextInputType.phone,
+                  controller: phoneController,
+                  errorText: controller.phoneError.value.isEmpty
+                      ? null
+                      : controller.phoneError.value,
+                  onChanged: controller.validatePhone,
+                )),
+
             const SizedBox(height: 24),
-            // Confirm Password Field
+
+            // -------- Password --------
             Obx(() => CustomTextField(
-              label: AppStrings.confirmPassword,
-              obscureText: true,
-              controller: confirmPasswordController,
-              errorText: controller.confirmPasswordError.value.isEmpty ? null : controller.confirmPasswordError.value,
-              onChanged: (value) => controller.validateConfirmPassword(value),
-            )),
+                  label: AppStrings.password,
+                  obscureText: true,
+                  controller: passwordController,
+                  errorText: controller.passwordError.value.isEmpty
+                      ? null
+                      : controller.passwordError.value,
+                  onChanged: controller.validatePassword,
+                )),
+
+            const SizedBox(height: 24),
+
+            // -------- Confirm Password --------
+            Obx(() => CustomTextField(
+                  label: AppStrings.confirmPassword,
+                  obscureText: true,
+                  controller: confirmPasswordController,
+                  errorText:
+                      controller.confirmPasswordError.value.isEmpty
+                          ? null
+                          : controller.confirmPasswordError.value,
+                  onChanged:
+                      controller.validateConfirmPassword,
+                )),
+
             const SizedBox(height: 32),
-            // Create Account Button
+
+            // -------- Create Account Button --------
             Obx(() => SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: controller.isSignUpEnabled.value && !authController.isLoading.value
-                    ? () => controller.signUp()
-                    : null,
-                child: authController.isLoading.value
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(AppColors.textWhite),
-                        ),
-                      )
-                    : const Text(
-                        AppStrings.createAccount,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-              ),
-            )),
-            // General Error Message
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: controller.isSignUpEnabled.value &&
+                            !authController.isLoading.value
+                        ? () => controller.signUp()
+                        : null,
+                    child: authController.isLoading.value
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(
+                                      AppColors.textWhite),
+                            ),
+                          )
+                        : const Text(
+                            AppStrings.createAccount,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                  ),
+                )),
+
+            // -------- General Error --------
             Obx(() => controller.generalError.value.isNotEmpty
                 ? Padding(
                     padding: const EdgeInsets.only(top: 8),
@@ -151,6 +202,7 @@ class SignUpScreen extends StatelessWidget {
                     ),
                   )
                 : const SizedBox.shrink()),
+
             const SizedBox(height: 32),
           ],
         ),
@@ -158,4 +210,3 @@ class SignUpScreen extends StatelessWidget {
     );
   }
 }
-

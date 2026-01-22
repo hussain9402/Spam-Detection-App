@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/constants/app_assets.dart'; // Import your new assets file
 import '../../../core/localization/app_localizations.dart';
 
 class CustomBottomNavBar extends StatelessWidget {
@@ -38,28 +39,28 @@ class CustomBottomNavBar extends StatelessWidget {
             children: [
               _buildNavItem(
                 context: context,
-                icon: Icons.message_rounded,
+                iconPath: AppAssets.messages, // Updated to use AppAssets
                 label: localizations.message,
                 index: 0,
                 isSelected: currentIndex == 0,
               ),
               _buildNavItem(
                 context: context,
-                icon: Icons.phone_rounded,
+                iconPath: AppAssets.calls, // Updated to use AppAssets
                 label: localizations.calls,
                 index: 1,
                 isSelected: currentIndex == 1,
               ),
               _buildNavItem(
                 context: context,
-                icon: Icons.person_rounded,
-                label: localizations.contacts,
+                iconPath: AppAssets.spam, // Updated to use AppAssets
+                label: 'Spam',
                 index: 2,
                 isSelected: currentIndex == 2,
               ),
               _buildNavItem(
                 context: context,
-                icon: Icons.settings_rounded,
+                iconPath: AppAssets.settings, // Updated to use AppAssets
                 label: localizations.settings,
                 index: 3,
                 isSelected: currentIndex == 3,
@@ -73,37 +74,41 @@ class CustomBottomNavBar extends StatelessWidget {
 
   Widget _buildNavItem({
     required BuildContext context,
-    required IconData icon,
+    required String iconPath,
     required String label,
     required int index,
     required bool isSelected,
   }) {
+    final Color activeColor = AppColors.primaryTeal;
+    final Color inactiveColor = Theme.of(context).brightness == Brightness.dark 
+        ? AppColors.textLightGray 
+        : AppColors.textGray;
+
+    final Color currentColor = isSelected ? activeColor : inactiveColor;
+
     return Expanded(
-      child: InkWell(
+      child: InkResponse(
         onTap: () => onTap(index),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              icon,
-              color: isSelected 
-                  ? AppColors.primaryTeal 
-                  : (Theme.of(context).brightness == Brightness.dark 
-                      ? AppColors.textLightGray 
-                      : AppColors.textLightGray),
-              size: 24,
+            Image.asset(
+              iconPath,
+              width: 24,
+              height: 24,
+              color: currentColor,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) {
+                return Icon(Icons.image_not_supported, size: 24, color: currentColor);
+              },
             ),
             const SizedBox(height: 4),
             Text(
               label,
               style: TextStyle(
                 fontSize: 12,
-                fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
-                color: isSelected 
-                    ? AppColors.primaryTeal 
-                    : (Theme.of(context).brightness == Brightness.dark 
-                        ? AppColors.textLightGray 
-                        : AppColors.textLightGray),
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                color: currentColor,
               ),
             ),
           ],
@@ -112,4 +117,3 @@ class CustomBottomNavBar extends StatelessWidget {
     );
   }
 }
-

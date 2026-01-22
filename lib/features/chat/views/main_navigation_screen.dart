@@ -4,7 +4,7 @@ import '../controllers/navigation_controller.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import 'message/message_screen.dart';
 import 'calls/calls_screen.dart';
-import 'contacts/contacts_screen.dart';
+import 'spam/spam_protection_screen.dart';
 import 'settings/settings_screen.dart';
 
 class MainNavigationScreen extends StatelessWidget {
@@ -20,7 +20,7 @@ class MainNavigationScreen extends StatelessWidget {
         children: const [
           MessageScreen(),
           CallsScreen(),
-          ContactsScreen(),
+          SpamProtectionScreen(),
           SettingsScreen(),
         ],
       )),

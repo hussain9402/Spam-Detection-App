@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:spamdetection/features/chat/views/contacts/contacts_screen.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../controllers/chat_controller.dart';
@@ -61,7 +62,7 @@ class MessageScreen extends StatelessWidget {
                 ],
               ),
             ),
-            
+
             // Chat List
             Expanded(
               child: Container(
@@ -84,17 +85,19 @@ class MessageScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
-                    
+
                     // Chat List
                     Expanded(
-                      child: Obx(() => ListView.builder(
-                        padding: const EdgeInsets.only(top: 8),
-                        itemCount: controller.chats.length,
-                        itemBuilder: (context, index) {
-                          final chat = controller.chats[index];
-                          return _buildChatItem(context, chat, controller);
-                        },
-                      )),
+                      child: Obx(
+                        () => ListView.builder(
+                          padding: const EdgeInsets.only(top: 8),
+                          itemCount: controller.chats.length,
+                          itemBuilder: (context, index) {
+                            final chat = controller.chats[index];
+                            return _buildChatItem(context, chat, controller);
+                          },
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -103,10 +106,21 @@ class MessageScreen extends StatelessWidget {
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Get.to(() => const ContactsScreen());
+        },
+        backgroundColor: AppColors.primaryTeal,
+        child: const Icon(Icons.contacts),
+      ),
     );
   }
 
-  Widget _buildChatItem(BuildContext context, ChatModel chat, ChatController controller) {
+  Widget _buildChatItem(
+    BuildContext context,
+    ChatModel chat,
+    ChatController controller,
+  ) {
     return InkWell(
       onTap: () {
         Get.to(() => ChatDetailScreen(chat: chat));
@@ -121,8 +135,8 @@ class MessageScreen extends StatelessWidget {
               height: 55,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: chat.isGroup 
-                    ? AppColors.primaryTeal 
+                color: chat.isGroup
+                    ? AppColors.primaryTeal
                     : AppColors.headerDarkGreen,
               ),
               child: chat.isGroup
@@ -138,7 +152,7 @@ class MessageScreen extends StatelessWidget {
                     ),
             ),
             const SizedBox(width: 16),
-            
+
             // Chat Info
             Expanded(
               child: Column(
@@ -170,7 +184,7 @@ class MessageScreen extends StatelessWidget {
                 ],
               ),
             ),
-            
+
             // Time and Badge
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -211,4 +225,3 @@ class MessageScreen extends StatelessWidget {
     );
   }
 }
-

@@ -63,10 +63,14 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                 ],
+
               )
             : const CircularProgressIndicator(),
-      )),
+            
+      ) 
+      ),
     );
+  
   }
 }
 
