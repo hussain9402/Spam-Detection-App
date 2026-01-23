@@ -1,15 +1,16 @@
 import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-// ignore: depend_on_referenced_packages
+import 'package:get_storage/get_storage.dart'; // Ensure you added this to pubspec.yaml
 
 import '../models/user_model.dart';
 import '../../../core/routes/app_routes.dart';
 
 class AuthController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final box = GetStorage(); // Local cache for the phone number
 
   final Rx<UserModel?> currentUser = Rx<UserModel?>(null);
   final RxBool isAuthenticated = false.obs;
@@ -20,22 +21,58 @@ class AuthController extends GetxController {
   void onInit() {
     super.onInit();
 
-    // Listen to auth state changes
-    _auth.authStateChanges().listen((User? user) {
+    // Listen to auth state changes and fetch Firestore details automatically
+    _auth.authStateChanges().listen((User? user) async {
       if (user != null) {
-        currentUser.value = UserModel(
-          id: user.uid,
-          name: user.displayName ?? '',
-          email: user.email ?? '',
-          photoUrl: user.photoURL,
-        );
-        isAuthenticated.value = true;
+        await _fetchUserAndCache(user);
       } else {
-        currentUser.value = null;
-        isAuthenticated.value = false;
+        _clearUserSession();
       }
     });
   }
+
+  // ------------------- SESSION MANAGEMENT -------------------
+
+  // Fetches extra data (phone) from Firestore and saves to local cache
+  Future<void> _fetchUserAndCache(User user) async {
+    try {
+      DocumentSnapshot doc = await _firestore.collection('users').doc(user.uid).get();
+      
+      String phone = '';
+      String name = user.displayName ?? '';
+
+      if (doc.exists) {
+        final data = doc.data() as Map<String, dynamic>;
+        // Use 'phone' as per your signup logic key
+        phone = data['phone'] ?? '';
+        name = data['name'] ?? name;
+        
+        // Save to local cache for ChatController
+        box.write('user_phone', phone);
+      }
+
+      currentUser.value = UserModel(
+        id: user.uid,
+        name: name,
+        email: user.email ?? '',
+        photoUrl: user.photoURL,
+        phoneNumber: phone, // Satisfies the required field in UserModel
+      );
+      
+      isAuthenticated.value = true;
+    } catch (e) {
+      log("Error fetching user session: $e");
+    }
+  }
+
+  void _clearUserSession() {
+    currentUser.value = null;
+    isAuthenticated.value = false;
+    box.remove('user_phone'); // Clean cache on logout
+  }
+
+  // Getter for the cached phone number
+  String get cachedPhoneNumber => box.read('user_phone') ?? '';
 
   // ------------------- NAVIGATION -------------------
   void navigateToOnboarding() => Get.offNamed(AppRoutes.onboarding);
@@ -54,7 +91,6 @@ class AuthController extends GetxController {
       );
 
       isLoading.value = false;
-
       return userCredential.user != null;
     } on FirebaseAuthException catch (e) {
       isLoading.value = false;
@@ -72,25 +108,23 @@ class AuthController extends GetxController {
     required String name,
     required String email,
     required String password,
-    required String phone, // phone number added
+    required String phone,
   }) async {
     try {
       isLoading.value = true;
       errorMessage.value = '';
 
-      // Create user with email and password
       final UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      // Update display name
       if (userCredential.user != null) {
         await userCredential.user!.updateDisplayName(name);
         await userCredential.user!.reload();
 
-        // Save extra user info (name + phone) in Firestore
-        await FirebaseFirestore.instance
+        // 1. Save phone number and name in Firestore
+        await _firestore
             .collection('users')
             .doc(userCredential.user!.uid)
             .set({
@@ -100,6 +134,9 @@ class AuthController extends GetxController {
           'phone': phone,
           'createdAt': FieldValue.serverTimestamp(),
         });
+
+        // 2. Cache the phone immediately for the current session
+        box.write('user_phone', phone);
       }
 
       isLoading.value = false;
@@ -113,29 +150,7 @@ class AuthController extends GetxController {
     } catch (e) {
       isLoading.value = false;
       log('Error during email signup: $e');
-      errorMessage.value = '$e';
       errorMessage.value = 'An unexpected error occurred. Please try again.';
-      return false;
-    }
-  }
-
-  // ------------------- PASSWORD RESET -------------------
-  Future<bool> sendPasswordResetEmail(String email) async {
-    try {
-      isLoading.value = true;
-      errorMessage.value = '';
-
-      await _auth.sendPasswordResetEmail(email: email);
-
-      isLoading.value = false;
-      return true;
-    } on FirebaseAuthException catch (e) {
-      isLoading.value = false;
-      errorMessage.value = _getErrorMessage(e.code);
-      return false;
-    } catch (e) {
-      isLoading.value = false;
-      errorMessage.value = 'Failed to send password reset email. Please try again.';
       return false;
     }
   }
@@ -145,8 +160,7 @@ class AuthController extends GetxController {
     try {
       isLoading.value = true;
       await _auth.signOut();
-      currentUser.value = null;
-      isAuthenticated.value = false;
+      _clearUserSession();
       isLoading.value = false;
       Get.offAllNamed(AppRoutes.onboarding);
     } catch (e) {
@@ -155,29 +169,15 @@ class AuthController extends GetxController {
     }
   }
 
-  // ------------------- ERROR HANDLER -------------------
   String _getErrorMessage(String code) {
     switch (code) {
-      case 'weak-password':
-        return 'The password provided is too weak.';
-      case 'email-already-in-use':
-        return 'An account already exists for that email.';
-      case 'invalid-email':
-        return 'The email address is invalid.';
-      case 'user-disabled':
-        return 'This user account has been disabled.';
-      case 'user-not-found':
-        return 'No user found for that email.';
-      case 'wrong-password':
-        return 'Wrong password provided.';
-      case 'too-many-requests':
-        return 'Too many requests. Please try again later.';
-      case 'operation-not-allowed':
-        return 'This operation is not allowed.';
-      case 'network-request-failed':
-        return 'Network error. Please check your internet connection.';
-      default:
-        return 'Authentication failed. Please try again.';
+      case 'weak-password': return 'The password provided is too weak.';
+      case 'email-already-in-use': return 'An account already exists for that email.';
+      case 'invalid-email': return 'The email address is invalid.';
+      case 'user-not-found': return 'No user found for that email.';
+      case 'wrong-password': return 'Wrong password provided.';
+      case 'network-request-failed': return 'Network error. Check your connection.';
+      default: return 'Authentication failed. Please try again.';
     }
   }
 }

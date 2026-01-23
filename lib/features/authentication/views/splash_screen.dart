@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:spamdetection/core/constants/app_assets.dart';
 import '../../../core/routes/app_routes.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../controllers/auth_controller.dart';
@@ -42,7 +43,7 @@ class _SplashScreenState extends State<SplashScreen> {
           children: [
             // App Logo
             Image.asset(
-              'assets/icons/app_logo-preview.png',
+              AppAssets.splashlogo,
               width: 200,
               height: 200,
               fit: BoxFit.contain,

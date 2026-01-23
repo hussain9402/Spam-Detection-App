@@ -1,82 +1,68 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+import 'package:spamdetection/features/authentication/controllers/auth_controller.dart';
 import '../models/chat_model.dart';
-import '../models/status_model.dart';
 
 class ChatController extends GetxController {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final RxList<ChatModel> chats = <ChatModel>[].obs;
-  final RxList<StatusModel> statuses = <StatusModel>[].obs;
+  final RxBool isLoading = false.obs;
 
   @override
   void onInit() {
     super.onInit();
-    _loadDummyData();
+    listenToMyChats();
   }
 
-  void _loadDummyData() {
-    // Dummy chats
-    chats.value = [
-      ChatModel(
-        id: '1',
-        name: 'Alex Linderson',
-        lastMessage: 'How are you today?',
-        lastMessageTime: DateTime.now().subtract(const Duration(minutes: 2)),
-        unreadCount: 3,
-      ),
-      ChatModel(
-        id: '2',
-        name: 'Team Align',
-        lastMessage: 'Don\'t miss to attend the meeting.',
-        lastMessageTime: DateTime.now().subtract(const Duration(minutes: 2)),
-        unreadCount: 4,
-        isGroup: true,
-      ),
-      ChatModel(
-        id: '3',
-        name: 'John Ahraham',
-        lastMessage: 'Hey! Can you join the meeting?',
-        lastMessageTime: DateTime.now().subtract(const Duration(minutes: 2)),
-      ),
-      ChatModel(
-        id: '4',
-        name: 'Sabila Sayma',
-        lastMessage: 'How are you today?',
-        lastMessageTime: DateTime.now().subtract(const Duration(minutes: 2)),
-      ),
-      ChatModel(
-        id: '5',
-        name: 'John Borino',
-        lastMessage: 'Have a good day 🌸',
-        lastMessageTime: DateTime.now().subtract(const Duration(minutes: 2)),
-      ),
-    ];
+  void listenToMyChats() {
+    // 1. Get your number from the AuthController
+    final String? myNumber = Get.find<AuthController>().currentUser.value?.phoneNumber;
 
-    // Dummy statuses
-    statuses.value = [
-      StatusModel(
-        id: 'my_status',
-        name: 'My status',
-        isMyStatus: true,
-      ),
-      StatusModel(
-        id: 'adil',
-        name: 'Adil',
-      ),
-      StatusModel(
-        id: 'marina',
-        name: 'Marina',
-      ),
-      StatusModel(
-        id: 'dean',
-        name: 'Dean',
-      ),
-      StatusModel(
-        id: 'max',
-        name: 'Max',
-      ),
-    ];
+    if (myNumber == null || myNumber.isEmpty) {
+      print("Error: No phone number found for current user.");
+      return;
+    }
+
+    isLoading.value = true;
+
+    // 2. Listen to the 'chats' collection where you are a participant
+    _firestore
+        .collection('chats')
+        .where('participants', arrayContains: myNumber)
+        .orderBy('lastMessageTime', descending: true)
+        .snapshots()
+        .listen((snapshot) {
+      chats.value = snapshot.docs.map((doc) {
+        final data = doc.data();
+        
+        // Find the other person's number
+        List participants = data['participants'] ?? [];
+        String otherPhone = participants.firstWhere(
+          (phone) => phone != myNumber,
+          orElse: () => "Unknown",
+        );
+
+        return ChatModel(
+          id: doc.id,
+          // Fallback to phone number if profile name isn't set yet
+          name: data['otherUserName'] ?? otherPhone, 
+          lastMessage: data['lastMessage'] ?? '',
+          lastMessageTime: (data['lastMessageTime'] as Timestamp?)?.toDate() ?? DateTime.now(),
+          phoneNumber: otherPhone,
+          senderPhone: myNumber,
+          unreadCount: data['unreadCount'] ?? 0,
+        );
+      }).toList();
+      
+      isLoading.value = false;
+    }, onError: (error) {
+      print("Firestore Error: $error");
+      isLoading.value = false;
+    });
   }
 
-  String _getTimeAgo(DateTime dateTime) {
+  // 3. The missing method to fix your MessageScreen error
+  String getTimeAgo(DateTime dateTime) {
     final now = DateTime.now();
     final difference = now.difference(dateTime);
 
@@ -92,7 +78,4 @@ class ChatController extends GetxController {
       return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
     }
   }
-
-  String getTimeAgo(DateTime dateTime) => _getTimeAgo(dateTime);
 }
-

@@ -11,6 +11,7 @@ class AppAssets {
   static const String calls = '$_iconPath/Call.png'; // Matches your current filename
   static const String spam = '$_iconPath/spam.png';
   static const String settings = '$_iconPath/settings.png';
+  static const String splashlogo = '$_iconPath/app_logo_preview.png';
 
   // Add other icons or images here as your project grows
   // static const String logo = '$_imagePath/app_logo.png';

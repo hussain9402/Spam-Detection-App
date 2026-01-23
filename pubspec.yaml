@@ -132,14 +132,14 @@ flutter:
 #   ios: true
 #   image_path: "assets/icons/app_logo_full.png"
   
-icons_launcher:
-  image_path: "assets/icons/app_logo_preview.png"
-  platforms:
-    android:
-      enable: true
-      image_path: "assets/icons/app_logo_preview.png"
-      notification_image: "assets/icons/app_logo_preview.png"
-      adaptive_background_image: "assets/icons/app_logo_preview.png"
-      adaptive_foreground_image: "assets/icons/app_logo_preview.png"
-      adaptive_round_image: "assets/icons/app_logo_preview.png"
-      adaptive_monochrome_image: "assets/icons/app_logo_preview.png"
+# icons_launcher:
+#   image_path: "assets/icons/app_logo_preview.png"
+#   platforms:
+#     android:
+#       enable: true
+#       image_path: "assets/icons/app_logo_preview.png"
+#       notification_image: "assets/icons/app_logo_preview.png"
+#       adaptive_background_image: "assets/icons/app_logo_preview.png"
+#       adaptive_foreground_image: "assets/icons/app_logo_preview.png"
+#       adaptive_round_image: "assets/icons/app_logo_preview.png"
+#       adaptive_monochrome_image: "assets/icons/app_logo_preview.png"

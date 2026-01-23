@@ -12,6 +12,7 @@ class MessageScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 1. Initialize the Controller
     final ChatController controller = Get.put(ChatController());
     final AppLocalizations localizations = AppLocalizations.of(context)!;
 
@@ -20,84 +21,44 @@ class MessageScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // Header
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              color: AppColors.headerDarkGreen,
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.search, color: AppColors.textWhite),
-                    onPressed: () {},
-                  ),
-                  Expanded(
-                    child: Text(
-                      localizations.home,
-                      style: const TextStyle(
-                        color: AppColors.textWhite,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      // Navigate to profile
-                    },
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppColors.primaryTeal,
-                      ),
-                      child: const Icon(
-                        Icons.person,
-                        color: AppColors.textWhite,
-                        size: 24,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            // Header Section
+            _buildHeader(context, localizations),
 
-            // Chat List
+            // Chat List Container
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
                   color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(50),
+                    topRight: Radius.circular(50),
                   ),
                 ),
                 child: Column(
                   children: [
                     // Small drag indicator
-                    Container(
-                      margin: const EdgeInsets.only(top: 8),
-                      width: 40,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: AppColors.borderGray,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
+                   
 
-                    // Chat List
+                    // 2. Wrap ListView in Obx to react to Firestore data
                     Expanded(
-                      child: Obx(
-                        () => ListView.builder(
+                      child: Obx(() {
+                        if (controller.isLoading.value) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+
+                        if (controller.chats.isEmpty) {
+                          return _buildEmptyState(localizations);
+                        }
+
+                        return ListView.builder(
                           padding: const EdgeInsets.only(top: 8),
                           itemCount: controller.chats.length,
                           itemBuilder: (context, index) {
                             final chat = controller.chats[index];
                             return _buildChatItem(context, chat, controller);
                           },
-                        ),
-                      ),
+                        );
+                      }),
                     ),
                   ],
                 ),
@@ -107,49 +68,77 @@ class MessageScreen extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Get.to(() => const ContactsScreen());
-        },
-        backgroundColor: AppColors.primaryTeal,
-        child: const Icon(Icons.contacts),
+        onPressed: () => Get.to(() => const ContactsScreen()),
+        backgroundColor: AppColors.primaryTeal.withAlpha(50),
+        child: const Icon(Icons.contacts, color: AppColors.primaryTeal),
       ),
     );
   }
 
-  Widget _buildChatItem(
-    BuildContext context,
-    ChatModel chat,
-    ChatController controller,
-  ) {
+  Widget _buildHeader(BuildContext context, AppLocalizations localizations) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      color: AppColors.headerDarkGreen,
+      child: Row(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.search, color: AppColors.textWhite),
+            onPressed: () {},
+          ),
+          Expanded(
+            child: Text(
+              localizations.home,
+              style: const TextStyle(
+                color: AppColors.textWhite,
+                fontSize: 30,
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          CircleAvatar(
+            backgroundColor: AppColors.primaryTeal?.withAlpha(50),
+            child:  Icon(Icons.person, color: AppColors.primaryTeal),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(AppLocalizations localizations) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.chat_bubble_outline, size: 64, color: AppColors.textGray.withOpacity(0.5)),
+          const SizedBox(height: 16),
+          const Text(
+            "No conversations yet",
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+          ),
+          const SizedBox(height: 8),
+          const Text("Tap the contact icon to start chatting"),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildChatItem(BuildContext context, ChatModel chat, ChatController controller) {
     return InkWell(
-      onTap: () {
-        Get.to(() => ChatDetailScreen(chat: chat));
-      },
+      onTap: () => Get.to(() => ChatDetailScreen(chat: chat)),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
             // Profile Picture
-            Container(
-              width: 55,
-              height: 55,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: chat.isGroup
-                    ? AppColors.primaryTeal
-                    : AppColors.headerDarkGreen,
+            CircleAvatar(
+              radius: 28,
+              backgroundColor: AppColors.primaryTeal?.withAlpha(50),
+              child: Icon(
+                chat.isGroup ? Icons.group : Icons.person,
+                color: AppColors.primaryTeal,
+                size: 28,
               ),
-              child: chat.isGroup
-                  ? const Icon(
-                      Icons.group,
-                      color: AppColors.textWhite,
-                      size: 28,
-                    )
-                  : const Icon(
-                      Icons.person,
-                      color: AppColors.textWhite,
-                      size: 28,
-                    ),
             ),
             const SizedBox(width: 16),
 
@@ -171,12 +160,8 @@ class MessageScreen extends StatelessWidget {
                     chat.lastMessage,
                     style: TextStyle(
                       fontSize: 14,
-                      color: chat.unreadCount > 0
-                          ? Theme.of(context).colorScheme.onSurface
-                          : AppColors.textLightGray,
-                      fontWeight: chat.unreadCount > 0
-                          ? FontWeight.w500
-                          : FontWeight.normal,
+                      color: chat.unreadCount > 0 ? Theme.of(context).colorScheme.onSurface : AppColors.textLightGray,
+                      fontWeight: chat.unreadCount > 0 ? FontWeight.w500 : FontWeight.normal,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -191,29 +176,19 @@ class MessageScreen extends StatelessWidget {
               children: [
                 Text(
                   controller.getTimeAgo(chat.lastMessageTime),
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textLightGray,
-                  ),
+                  style: const TextStyle(fontSize: 12, color: AppColors.textLightGray),
                 ),
                 if (chat.unreadCount > 0) ...[
                   const SizedBox(height: 6),
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 2,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: AppColors.unreadBadge,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      chat.unreadCount.toString(),
-                      style: const TextStyle(
-                        color: AppColors.textWhite,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      '${chat.unreadCount}',
+                      style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],

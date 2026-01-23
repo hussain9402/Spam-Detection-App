@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   // Primary Colors
-  static const Color primaryTeal = Color(0xFF1E1E1E); // Dark gray/black primary
+  static const Color primaryTeal2 = Color(0xFF1E1E1E); // Dark gray/black primary
+   static const Color primaryTeal = Color(0xFFFBC02D); // Dark gray/black primary
   static const Color headerDarkGreen = Color(0xFF1E1E1E); // Dark header background (#1E1E1E)
   
   // Gradient Colors

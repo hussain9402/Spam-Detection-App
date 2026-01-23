@@ -105,20 +105,20 @@ class LoginController extends GetxController {
       return;
     }
     
-    final success = await _authController.sendPasswordResetEmail(email.value);
+    // final success = await _authController.sendPasswordResetEmail(email.value);
     
-    if (success) {
-      Get.snackbar(
-        'Password Reset Email Sent',
-        'Please check your email for password reset instructions.',
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    } else {
-      Get.snackbar(
-        'Failed',
-        _authController.errorMessage.value,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    }
+    // if (success) {
+    //   Get.snackbar(
+    //     'Password Reset Email Sent',
+    //     'Please check your email for password reset instructions.',
+    //     snackPosition: SnackPosition.BOTTOM,
+    //   );
+    // } else {
+    //   Get.snackbar(
+    //     'Failed',
+    //     _authController.errorMessage.value,
+    //     snackPosition: SnackPosition.BOTTOM,
+    //   );
+    // }
   }
 }

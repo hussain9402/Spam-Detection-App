@@ -79,12 +79,12 @@ class CustomBottomNavBar extends StatelessWidget {
     required int index,
     required bool isSelected,
   }) {
-    final Color activeColor = AppColors.primaryTeal;
+    final Color? activeColor = Colors.yellow[700];
     final Color inactiveColor = Theme.of(context).brightness == Brightness.dark 
         ? AppColors.textLightGray 
         : AppColors.textGray;
 
-    final Color currentColor = isSelected ? activeColor : inactiveColor;
+    final Color? currentColor = isSelected ? activeColor : inactiveColor;
 
     return Expanded(
       child: InkResponse(
