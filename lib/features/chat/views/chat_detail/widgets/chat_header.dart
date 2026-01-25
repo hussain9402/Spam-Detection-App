@@ -5,6 +5,7 @@ import 'package:spamdetection/core/constants/app_colors.dart';
 import 'package:spamdetection/core/localization/app_localizations.dart';
 import 'package:spamdetection/core/routes/app_routes.dart';
 import 'package:spamdetection/features/chat/models/chat_model.dart';
+import 'package:spamdetection/features/chat/views/chat_detail/ChatInfoScreen.dart';
 
 class ChatHeader extends StatelessWidget {
   final ChatModel chat;
@@ -28,22 +29,31 @@ class ChatHeader extends StatelessWidget {
           ),
         ),
       ),
-      child: Row(
-        children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              // This matches the mobile gesture behavior
-              Get.offAllNamed(AppRoutes.mainNavigation);
-            },
-          ),
-          _buildProfileStack(context),
-          const SizedBox(width: 12),
-          _buildNameAndStatus(context, localizations),
-          IconButton(icon: const Icon(Icons.phone), onPressed: () {}),
-          IconButton(icon: const Icon(Icons.videocam), onPressed: () {}),
-        ],
+      child: // Inside ChatHeader Widget build...
+Row(
+  children: [
+    IconButton(
+      icon: const Icon(Icons.arrow_back),
+      onPressed: () => Get.offAllNamed(AppRoutes.mainNavigation),
+    ),
+    // WRAP THIS IN GESTURE DETECTOR
+    Expanded(
+      child: GestureDetector(
+        onTap: () => Get.to(() => ChatInfoScreen(chat: chat)),
+        behavior: HitTestBehavior.opaque,
+        child: Row(
+          children: [
+            _buildProfileStack(context),
+            const SizedBox(width: 12),
+            _buildNameAndStatus(context, localizations),
+          ],
+        ),
       ),
+    ),
+    IconButton(icon: const Icon(Icons.phone), onPressed: () {}),
+    IconButton(icon: const Icon(Icons.videocam), onPressed: () {}),
+  ],
+),
     );
   }
 
@@ -85,7 +95,7 @@ class ChatHeader extends StatelessWidget {
         children: [
           Text(
             chat.name,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600,color: AppColors.textWhite),
           ),
           Text(
             localizations.activeNow,

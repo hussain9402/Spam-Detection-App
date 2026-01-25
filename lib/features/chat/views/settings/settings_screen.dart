@@ -14,7 +14,8 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AuthController authController = Get.find<AuthController>();
-    final LanguageController languageController = Get.find<LanguageController>();
+    final LanguageController languageController =
+        Get.find<LanguageController>();
     final ThemeController themeController = Get.find<ThemeController>();
     final AppLocalizations localizations = AppLocalizations.of(context)!;
 
@@ -45,13 +46,16 @@ class SettingsScreen extends StatelessWidget {
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.more_vert, color: AppColors.textWhite),
+                    icon: const Icon(
+                      Icons.more_vert,
+                      color: AppColors.textWhite,
+                    ),
                     onPressed: () {},
                   ),
                 ],
               ),
             ),
-            
+
             // Settings Content
             Expanded(
               child: Container(
@@ -65,67 +69,77 @@ class SettingsScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     // User Profile Section
-                    Obx(() => Container(
-                      padding: const EdgeInsets.all(16),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 60,
-                            height: 60,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: AppColors.headerDarkGreen,
-                            ),
-                            child: authController.currentUser.value?.photoUrl != null
-                                ? ClipOval(
-                                    child: Image.network(
-                                      authController.currentUser.value!.photoUrl!,
-                                      fit: BoxFit.cover,
+                    Obx(
+                      () => Container(
+                        padding: const EdgeInsets.all(16),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 60,
+                              height: 60,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: AppColors.headerDarkGreen,
+                              ),
+                              child:
+                                  authController.currentUser.value?.photoUrl !=
+                                      null
+                                  ? ClipOval(
+                                      child: Image.network(
+                                        authController
+                                            .currentUser
+                                            .value!
+                                            .photoUrl!,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    )
+                                  : const Icon(
+                                      Icons.person,
+                                      color: AppColors.textWhite,
+                                      size: 32,
                                     ),
-                                  )
-                                : const Icon(
-                                    Icons.person,
-                                    color: AppColors.textWhite,
-                                    size: 32,
-                                  ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  authController.currentUser.value?.name ?? 'User',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
-                                    color: Theme.of(context).colorScheme.onSurface,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  localizations.neverGiveUp,
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    color: AppColors.textLightGray,
-                                  ),
-                                ),
-                              ],
                             ),
-                          ),
-                          IconButton(
-                            icon: const Icon(
-                              Icons.qr_code_2,
-                              color: AppColors.textLightGray,
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    authController.currentUser.value?.name ??
+                                        'User',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    localizations.neverGiveUp,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: AppColors.textLightGray,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                            onPressed: () {},
-                          ),
-                        ],
+                            IconButton(
+                              icon: const Icon(
+                                Icons.qr_code_2,
+                                color: AppColors.textLightGray,
+                              ),
+                              onPressed: () {},
+                            ),
+                          ],
+                        ),
                       ),
-                    )),
-                    
+                    ),
+
                     const Divider(height: 1),
-                    
+
                     // Settings Options
                     Expanded(
                       child: ListView(
@@ -137,21 +151,27 @@ class SettingsScreen extends StatelessWidget {
                             subtitle: localizations.accountSubtitle,
                             onTap: () {
                               if (authController.currentUser.value != null) {
-                                Get.to(() => UserProfileScreen(
-                                  user: authController.currentUser.value!,
-                                ));
+                                Get.to(
+                                  () => UserProfileScreen(
+                                    // This ensures the actual user object (including phone) is passed
+                                    user: authController.currentUser.value!,
+                                  ),
+                                );
                               }
                             },
                           ),
-                          Obx(() => _buildSettingsItem(
-                            context: context,
-                            icon: Icons.language,
-                            title: localizations.appLanguage,
-                            subtitle: languageController.getCurrentLanguageName(),
-                            onTap: () {
-                              Get.to(() => const LanguageSelectionScreen());
-                            },
-                          )),
+                          Obx(
+                            () => _buildSettingsItem(
+                              context: context,
+                              icon: Icons.language,
+                              title: localizations.appLanguage,
+                              subtitle: languageController
+                                  .getCurrentLanguageName(),
+                              onTap: () {
+                                Get.to(() => const LanguageSelectionScreen());
+                              },
+                            ),
+                          ),
                           _buildSettingsItem(
                             context: context,
                             icon: Icons.notifications_outlined,
@@ -166,19 +186,25 @@ class SettingsScreen extends StatelessWidget {
                             subtitle: localizations.helpSubtitle,
                             onTap: () {},
                           ),
-                          Obx(() => _buildSettingsItem(
-                            context: context,
-                            icon: Icons.palette_outlined,
-                            title: localizations.appTheme,
-                            subtitle: themeController.getCurrentThemeName(
-                              localizations.lightTheme,
-                              localizations.darkTheme,
-                              localizations.systemTheme,
+                          Obx(
+                            () => _buildSettingsItem(
+                              context: context,
+                              icon: Icons.palette_outlined,
+                              title: localizations.appTheme,
+                              subtitle: themeController.getCurrentThemeName(
+                                localizations.lightTheme,
+                                localizations.darkTheme,
+                                localizations.systemTheme,
+                              ),
+                              onTap: () {
+                                _showThemeDialog(
+                                  context,
+                                  themeController,
+                                  localizations,
+                                );
+                              },
                             ),
-                            onTap: () {
-                              _showThemeDialog(context, themeController, localizations);
-                            },
-                          )),
+                          ),
                           _buildSettingsItem(
                             context: context,
                             icon: Icons.person_add_outlined,
@@ -196,8 +222,10 @@ class SettingsScreen extends StatelessWidget {
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.errorRed,
-                                foregroundColor: AppColors.textWhite,
-                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                foregroundColor: AppColors.textBlack,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
@@ -238,11 +266,7 @@ class SettingsScreen extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         child: Row(
           children: [
-            Icon(
-              icon,
-              color: AppColors.textLightGray,
-              size: 24,
-            ),
+            Icon(icon, color: AppColors.textLightGray, size: 24),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
@@ -269,62 +293,65 @@ class SettingsScreen extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(
-              Icons.chevron_right,
-              color: AppColors.textLightGray,
-            ),
+            const Icon(Icons.chevron_right, color: AppColors.textLightGray),
           ],
         ),
       ),
     );
   }
 
-  void _showThemeDialog(BuildContext context, ThemeController themeController, AppLocalizations localizations) {
+  void _showThemeDialog(
+    BuildContext context,
+    ThemeController themeController,
+    AppLocalizations localizations,
+  ) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return Obx(() => AlertDialog(
-          backgroundColor: Theme.of(context).dialogBackgroundColor,
-          title: Text(
-            localizations.appTheme,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: Theme.of(context).colorScheme.onSurface,
+        return Obx(
+          () => AlertDialog(
+            backgroundColor: Theme.of(context).dialogBackgroundColor,
+            title: Text(
+              localizations.appTheme,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildThemeOption(
+                  context: context,
+                  themeController: themeController,
+                  themeMode: 'light',
+                  themeName: localizations.lightTheme,
+                  icon: Icons.light_mode,
+                  currentMode: themeController.themeMode.value,
+                ),
+                const SizedBox(height: 8),
+                _buildThemeOption(
+                  context: context,
+                  themeController: themeController,
+                  themeMode: 'dark',
+                  themeName: localizations.darkTheme,
+                  icon: Icons.dark_mode,
+                  currentMode: themeController.themeMode.value,
+                ),
+                const SizedBox(height: 8),
+                _buildThemeOption(
+                  context: context,
+                  themeController: themeController,
+                  themeMode: 'system',
+                  themeName: localizations.systemTheme,
+                  icon: Icons.brightness_auto,
+                  currentMode: themeController.themeMode.value,
+                ),
+              ],
             ),
           ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildThemeOption(
-                context: context,
-                themeController: themeController,
-                themeMode: 'light',
-                themeName: localizations.lightTheme,
-                icon: Icons.light_mode,
-                currentMode: themeController.themeMode.value,
-              ),
-              const SizedBox(height: 8),
-              _buildThemeOption(
-                context: context,
-                themeController: themeController,
-                themeMode: 'dark',
-                themeName: localizations.darkTheme,
-                icon: Icons.dark_mode,
-                currentMode: themeController.themeMode.value,
-              ),
-              const SizedBox(height: 8),
-              _buildThemeOption(
-                context: context,
-                themeController: themeController,
-                themeMode: 'system',
-                themeName: localizations.systemTheme,
-                icon: Icons.brightness_auto,
-                currentMode: themeController.themeMode.value,
-              ),
-            ],
-          ),
-        ));
+        );
       },
     );
   }
@@ -340,7 +367,9 @@ class SettingsScreen extends StatelessWidget {
     final isSelected = currentMode == themeMode;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     // Use blue for selection in dark theme, primary color in light theme
-    final selectionColor = isDark ? AppColors.selectionBlue : AppColors.primaryTeal;
+    final selectionColor = isDark
+        ? AppColors.selectionBlue
+        : AppColors.primaryTeal;
 
     return InkWell(
       onTap: () {
@@ -350,26 +379,28 @@ class SettingsScreen extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         decoration: BoxDecoration(
-          color: isSelected 
-              ? (isDark 
-                  ? AppColors.selectionBlue.withOpacity(0.2) 
-                  : AppColors.primaryTeal.withOpacity(0.1))
+          color: isSelected
+              ? (isDark
+                    ? AppColors.selectionBlue.withOpacity(0.2)
+                    : AppColors.primaryTeal.withOpacity(0.1))
               : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
           border: isSelected
               ? Border.all(color: selectionColor, width: 2)
               : Border.all(
-                  color: isDark ? AppColors.borderDark : AppColors.dividerGray, 
-                  width: 1
+                  color: isDark ? AppColors.borderDark : AppColors.dividerGray,
+                  width: 1,
                 ),
         ),
         child: Row(
           children: [
             Icon(
               icon,
-              color: isSelected 
-                  ? selectionColor 
-                  : (isDark ? AppColors.textLightGray : AppColors.textLightGray),
+              color: isSelected
+                  ? selectionColor
+                  : (isDark
+                        ? AppColors.textLightGray
+                        : AppColors.textLightGray),
               size: 24,
             ),
             const SizedBox(width: 12),
@@ -379,22 +410,16 @@ class SettingsScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                  color: isSelected 
-                      ? selectionColor 
+                  color: isSelected
+                      ? selectionColor
                       : Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ),
-            if (isSelected)
-              Icon(
-                Icons.check,
-                color: selectionColor,
-                size: 20,
-              ),
+            if (isSelected) Icon(Icons.check, color: selectionColor, size: 20),
           ],
         ),
       ),
     );
   }
 }
-

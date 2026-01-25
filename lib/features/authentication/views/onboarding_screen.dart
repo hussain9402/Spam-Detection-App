@@ -25,7 +25,7 @@ class OnboardingScreen extends StatelessWidget {
                 const Spacer(flex: 2),
                 // App Logo
                 Image.asset(
-                  'assets/icons/app_logo_full.png',
+                  'assets/icons/app_logo_preview.png',
                   width: 120,
                   height: 120,
                   fit: BoxFit.contain,
@@ -65,114 +65,14 @@ class OnboardingScreen extends StatelessWidget {
                   ),
                 ),
                 const Spacer(flex: 2),
-                // Social Login Buttons - COMMENTED OUT (keeping only email/password)
-                // Obx(() => Row(
-                //   mainAxisAlignment: MainAxisAlignment.center,
-                //   children: [
-                //     SocialLoginButton(
-                //       provider: SocialProvider.facebook,
-                //       onPressed: authController.isLoading.value
-                //           ? null
-                //           : () {
-                //               authController.handleSocialLogin('facebook').then((success) {
-                //                 if (success) {
-                //                   Get.offAllNamed(AppRoutes.home);
-                //                 } else {
-                //                   Get.snackbar(
-                //                     'Sign In Failed',
-                //                     authController.errorMessage.value,
-                //                     snackPosition: SnackPosition.BOTTOM,
-                //                   );
-                //                 }
-                //               });
-                //             },
-                //     ),
-                //     const SizedBox(width: 16),
-                //     SocialLoginButton(
-                //       provider: SocialProvider.google,
-                //       onPressed: authController.isLoading.value
-                //           ? null
-                //           : () {
-                //               authController.handleSocialLogin('google').then((success) {
-                //                 if (success) {
-                //                   Get.offAllNamed(AppRoutes.home);
-                //                 } else {
-                //                   Get.snackbar(
-                //                     'Sign In Failed',
-                //                     authController.errorMessage.value,
-                //                     snackPosition: SnackPosition.BOTTOM,
-                //                   );
-                //                 }
-                //               });
-                //             },
-                //     ),
-                //     const SizedBox(width: 16),
-                //     SocialLoginButton(
-                //       provider: SocialProvider.apple,
-                //       onPressed: authController.isLoading.value
-                //           ? null
-                //           : () {
-                //               authController.handleSocialLogin('apple').then((success) {
-                //                 if (success) {
-                //                   Get.offAllNamed(AppRoutes.home);
-                //                 } else {
-                //                   Get.snackbar(
-                //                     'Sign In Failed',
-                //                     authController.errorMessage.value,
-                //                     snackPosition: SnackPosition.BOTTOM,
-                //                   );
-                //                 }
-                //               });
-                //             },
-                //     ),
-                //   ],
-                // )),
-                // // Loading indicator
-                // Obx(() => authController.isLoading.value
-                //     ? const Padding(
-                //         padding: EdgeInsets.only(top: 16),
-                //         child: CircularProgressIndicator(
-                //           valueColor: AlwaysStoppedAnimation<Color>(AppColors.textWhite),
-                //         ),
-                //       )
-                //     : const SizedBox.shrink()),
-                // const SizedBox(height: 32),
-                // // OR Separator
-                // Row(
-                //   children: [
-                //     Expanded(
-                //       child: Divider(
-                //         color: AppColors.textWhite.withOpacity(0.3),
-                //         thickness: 1,
-                //       ),
-                //     ),
-                //     Padding(
-                //       padding: const EdgeInsets.symmetric(horizontal: 16),
-                //       child: Text(
-                //         AppStrings.or,
-                //         style: TextStyle(
-                //           color: AppColors.textWhite.withOpacity(0.9),
-                //           fontSize: 14,
-                //         ),
-                //       ),
-                //     ),
-                //     Expanded(
-                //       child: Divider(
-                //         color: AppColors.textWhite.withOpacity(0.3),
-                //         thickness: 1,
-                //       ),
-                //     ),
-                //   ],
-                // ),
-                // const SizedBox(height: 24),
-                // Sign up with mail button
+             
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () => authController.navigateToSignup(),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primaryTeal,
-                      foregroundColor: AppColors.textWhite,
+                      foregroundColor: AppColors.backgroundDark,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),

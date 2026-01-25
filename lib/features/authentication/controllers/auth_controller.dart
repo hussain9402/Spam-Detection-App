@@ -17,25 +17,34 @@ class AuthController extends GetxController {
   final RxBool isLoading = false.obs;
   final RxString errorMessage = ''.obs;
 
-  @override
-  void onInit() {
-    super.onInit();
+@override
+void onInit() {
+  super.onInit();
 
-    // Listen to auth state changes and fetch Firestore details automatically
-    _auth.authStateChanges().listen((User? user) async {
-      if (user != null) {
+  _auth.authStateChanges().listen((User? user) async {
+    // 1. Check if "Remember Me" was saved in local storage
+    bool shouldRemember = box.read('remember_me') ?? false;
+
+    if (user != null) {
+      if (shouldRemember) {
         await _fetchUserAndCache(user);
       } else {
-        _clearUserSession();
+        // If not remembered, treat as unauthenticated for auto-navigation
+        // but don't force logout here to avoid infinite loops during login
+        isAuthenticated.value = false;
       }
-    });
-  }
+    } else {
+      _clearUserSession();
+    }
+  });
+}
 
   // ------------------- SESSION MANAGEMENT -------------------
 
   // Fetches extra data (phone) from Firestore and saves to local cache
   Future<void> _fetchUserAndCache(User user) async {
     try {
+      print("DEBUG: Fetching user data for UID: ${user.uid}");
       DocumentSnapshot doc = await _firestore.collection('users').doc(user.uid).get();
       
       String phone = '';
@@ -43,12 +52,15 @@ class AuthController extends GetxController {
 
       if (doc.exists) {
         final data = doc.data() as Map<String, dynamic>;
+        print("DEBUG: User document data: $data");
         // Use 'phone' as per your signup logic key
-        phone = data['phone'] ?? '';
+        phone = data['phone'] ?? data['phoneNumber'] ?? '';
         name = data['name'] ?? name;
         
         // Save to local cache for ChatController
         box.write('user_phone', phone);
+      } else {
+        print("DEBUG: User document does not exist in Firestore!");
       }
 
       currentUser.value = UserModel(
@@ -59,6 +71,7 @@ class AuthController extends GetxController {
         phoneNumber: phone, // Satisfies the required field in UserModel
       );
       
+      print("DEBUG: currentUser set with phone: ${currentUser.value?.phoneNumber}");
       isAuthenticated.value = true;
     } catch (e) {
       log("Error fetching user session: $e");
@@ -90,8 +103,15 @@ class AuthController extends GetxController {
         password: password,
       );
 
+      if (userCredential.user != null) {
+        // Fetch user data immediately after login success
+        await _fetchUserAndCache(userCredential.user!);
+        isLoading.value = false;
+        return true;
+      }
+
       isLoading.value = false;
-      return userCredential.user != null;
+      return false;
     } on FirebaseAuthException catch (e) {
       isLoading.value = false;
       errorMessage.value = _getErrorMessage(e.code);
@@ -104,57 +124,44 @@ class AuthController extends GetxController {
   }
 
   // ------------------- EMAIL SIGNUP WITH PHONE -------------------
-  Future<bool> handleEmailSignup({
-    required String name,
-    required String email,
-    required String password,
-    required String phone,
-  }) async {
-    try {
-      isLoading.value = true;
-      errorMessage.value = '';
+ Future<bool> handleEmailSignup({
+  required String name,
+  required String email,
+  required String password,
+  required String phone,
+}) async {
+  try {
+    isLoading.value = true;
+    errorMessage.value = '';
 
-      final UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+    final UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
 
-      if (userCredential.user != null) {
-        await userCredential.user!.updateDisplayName(name);
-        await userCredential.user!.reload();
+    if (userCredential.user != null) {
+      await userCredential.user!.updateDisplayName(name);
+      
+      await _firestore.collection('users').doc(userCredential.user!.uid).set({
+        'uid': userCredential.user!.uid,
+        'name': name,
+        'email': email,
+        'phone': phone,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
 
-        // 1. Save phone number and name in Firestore
-        await _firestore
-            .collection('users')
-            .doc(userCredential.user!.uid)
-            .set({
-          'uid': userCredential.user!.uid,
-          'name': name,
-          'email': email,
-          'phone': phone,
-          'createdAt': FieldValue.serverTimestamp(),
-        });
-
-        // 2. Cache the phone immediately for the current session
-        box.write('user_phone', phone);
-      }
-
-      isLoading.value = false;
-      return true;
-
-    } on FirebaseAuthException catch (e) {
-      isLoading.value = false;
-      log('Error during email signup: ${e.message}');
-      errorMessage.value = _getErrorMessage(e.code);
-      return false;
-    } catch (e) {
-      isLoading.value = false;
-      log('Error during email signup: $e');
-      errorMessage.value = 'An unexpected error occurred. Please try again.';
-      return false;
+      // 2. FORCE LOGOUT IMMEDIATELY after signup
+      await _auth.signOut(); 
+      _clearUserSession();
     }
-  }
 
+    isLoading.value = false;
+    return true; // Return true to trigger navigation to Login in the UI
+  } on FirebaseAuthException catch (e) {
+    isLoading.value = false;
+    errorMessage.value = _getErrorMessage(e.code);
+    return false;
+  }}
   // ------------------- LOGOUT -------------------
   Future<void> logout() async {
     try {

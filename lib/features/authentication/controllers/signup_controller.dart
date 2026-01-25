@@ -117,7 +117,8 @@ class SignUpController extends GetxController {
           snackPosition: SnackPosition.BOTTOM,
         );
       } else {
-        Get.offAllNamed(AppRoutes.mainNavigation);
+       Get.snackbar('Success', 'Account created. Please login.');
+      Get.offAllNamed(AppRoutes.login);
       }
     }
   }

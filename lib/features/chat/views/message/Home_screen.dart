@@ -13,12 +13,12 @@ class MessageScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // 1. Initialize the Controller
-    final ChatController controller = Get.put(ChatController());
+   final ChatController controller = Get.put(ChatController());
     final AppLocalizations localizations = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: AppColors.headerDarkGreen,
-      body: SafeArea(
+      body: SafeArea( 
         child: Column(
           children: [
             // Header Section
@@ -97,7 +97,7 @@ class MessageScreen extends StatelessWidget {
             ),
           ),
           CircleAvatar(
-            backgroundColor: AppColors.primaryTeal?.withAlpha(50),
+            backgroundColor: AppColors.primaryTeal.withAlpha(50),
             child:  Icon(Icons.person, color: AppColors.primaryTeal),
           ),
         ],
@@ -133,7 +133,7 @@ class MessageScreen extends StatelessWidget {
             // Profile Picture
             CircleAvatar(
               radius: 28,
-              backgroundColor: AppColors.primaryTeal?.withAlpha(50),
+              backgroundColor: AppColors.primaryTeal.withAlpha(50),
               child: Icon(
                 chat.isGroup ? Icons.group : Icons.person,
                 color: AppColors.primaryTeal,
@@ -156,15 +156,33 @@ class MessageScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    chat.lastMessage,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: chat.unreadCount > 0 ? Theme.of(context).colorScheme.onSurface : AppColors.textLightGray,
-                      fontWeight: chat.unreadCount > 0 ? FontWeight.w500 : FontWeight.normal,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  Row(
+                    children: [
+                      if (chat.lastMessage.toLowerCase().contains('voice message') ||
+                          chat.lastMessage.contains('🎤'))
+                        const Icon(
+                          Icons.mic,
+                          size: 14,
+                          color: AppColors.primaryTeal,
+                        ),
+                      if (chat.lastMessage.toLowerCase().contains('voice message') ||
+                          chat.lastMessage.contains('🎤'))
+                        const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          chat.lastMessage,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: chat.unreadCount > 0
+                                ? Theme.of(context).colorScheme.onSurface
+                                : AppColors.textLightGray,
+                            fontWeight: chat.unreadCount > 0 ? FontWeight.w500 : FontWeight.normal,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

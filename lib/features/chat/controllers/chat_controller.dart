@@ -11,15 +11,27 @@ class ChatController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    
+    // 1. Try to load immediately if user is already available
     listenToMyChats();
+
+    // 2. Also re-trigger if the current user changes (e.g., after login or splash fetch)
+    ever(Get.find<AuthController>().currentUser, (user) {
+      print("DEBUG: currentUser changed: ${user?.phoneNumber}");
+      if (user != null && user.phoneNumber.isNotEmpty) {
+        listenToMyChats();
+      }
+    });
   }
 
   void listenToMyChats() {
     // 1. Get your number from the AuthController
     final String? myNumber = Get.find<AuthController>().currentUser.value?.phoneNumber;
 
+    print("DEBUG: listenToMyChats called. myNumber: '$myNumber'");
+
     if (myNumber == null || myNumber.isEmpty) {
-      print("Error: No phone number found for current user.");
+      // Don't print error yet, just wait for the 'ever' listener to trigger
       return;
     }
 
@@ -29,10 +41,11 @@ class ChatController extends GetxController {
     _firestore
         .collection('chats')
         .where('participants', arrayContains: myNumber)
-        .orderBy('lastMessageTime', descending: true)
         .snapshots()
         .listen((snapshot) {
-      chats.value = snapshot.docs.map((doc) {
+      print("DEBUG: Received snapshot with ${snapshot.docs.length} chats");
+      
+      final List<ChatModel> fetchedChats = snapshot.docs.map((doc) {
         final data = doc.data();
         
         // Find the other person's number
@@ -42,18 +55,25 @@ class ChatController extends GetxController {
           orElse: () => "Unknown",
         );
 
+        final lastMsg = data['lastMessage'] ?? '';
+        print("DEBUG: Chat ${doc.id} lastMessage: '$lastMsg'");
+
         return ChatModel(
           id: doc.id,
           // Fallback to phone number if profile name isn't set yet
           name: data['otherUserName'] ?? otherPhone, 
-          lastMessage: data['lastMessage'] ?? '',
+          lastMessage: lastMsg,
           lastMessageTime: (data['lastMessageTime'] as Timestamp?)?.toDate() ?? DateTime.now(),
           phoneNumber: otherPhone,
           senderPhone: myNumber,
           unreadCount: data['unreadCount'] ?? 0,
         );
       }).toList();
+
+      // Sort manually since we removed orderBy from Firestore to avoid index requirement
+      fetchedChats.sort((a, b) => b.lastMessageTime.compareTo(a.lastMessageTime));
       
+      chats.value = fetchedChats;
       isLoading.value = false;
     }, onError: (error) {
       print("Firestore Error: $error");

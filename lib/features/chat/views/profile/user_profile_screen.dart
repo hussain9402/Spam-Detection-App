@@ -6,15 +6,12 @@ import '../../../authentication/models/user_model.dart';
 class UserProfileScreen extends StatelessWidget {
   final UserModel user;
 
-  const UserProfileScreen({
-    super.key,
-    required this.user,
-  });
+  const UserProfileScreen({super.key, required this.user});
 
   @override
   Widget build(BuildContext context) {
     final AppLocalizations localizations = AppLocalizations.of(context)!;
-    
+
     return Scaffold(
       backgroundColor: AppColors.headerDarkGreen,
       body: SafeArea(
@@ -37,7 +34,7 @@ class UserProfileScreen extends StatelessWidget {
                 ],
               ),
             ),
-            
+
             // Profile Header Section
             Container(
               padding: const EdgeInsets.only(bottom: 40),
@@ -51,10 +48,7 @@ class UserProfileScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: Colors.yellow[700],
-                      border: Border.all(
-                        color: AppColors.textWhite,
-                        width: 3,
-                      ),
+                      border: Border.all(color: AppColors.backgroundDarkSurface, width: 3),
                     ),
                     child: user.photoUrl != null
                         ? ClipOval(
@@ -65,12 +59,12 @@ class UserProfileScreen extends StatelessWidget {
                           )
                         : const Icon(
                             Icons.person,
-                            color: AppColors.textWhite,
+                            color: AppColors.backgroundDarkSurface,
                             size: 50,
                           ),
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Name and Username
                   Text(
                     user.name.isNotEmpty ? user.name : 'User',
@@ -89,36 +83,24 @@ class UserProfileScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  
+
                   // Action Buttons
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _buildActionButton(
-                        icon: Icons.message,
-                        onTap: () {},
-                      ),
+                      _buildActionButton(icon: Icons.message, onTap: () {}),
                       const SizedBox(width: 24),
-                      _buildActionButton(
-                        icon: Icons.videocam,
-                        onTap: () {},
-                      ),
+                      _buildActionButton(icon: Icons.videocam, onTap: () {}),
                       const SizedBox(width: 24),
-                      _buildActionButton(
-                        icon: Icons.phone,
-                        onTap: () {},
-                      ),
+                      _buildActionButton(icon: Icons.phone, onTap: () {}),
                       const SizedBox(width: 24),
-                      _buildActionButton(
-                        icon: Icons.more_vert,
-                        onTap: () {},
-                      ),
+                      _buildActionButton(icon: Icons.more_vert, onTap: () {}),
                     ],
                   ),
                 ],
               ),
             ),
-            
+
             // Content Card
             Expanded(
               child: Container(
@@ -132,16 +114,7 @@ class UserProfileScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     // Small drag indicator
-                    Container(
-                      margin: const EdgeInsets.only(top: 8),
-                      width: 40,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: AppColors.borderGray,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                    
+
                     // Profile Details
                     Expanded(
                       child: ListView(
@@ -156,7 +129,9 @@ class UserProfileScreen extends StatelessWidget {
                           _buildDetailItem(
                             context: context,
                             label: localizations.emailAddress,
-                            value: user.email.isNotEmpty ? user.email : 'No email',
+                            value: user.email.isNotEmpty
+                                ? user.email
+                                : 'No email',
                           ),
                           const SizedBox(height: 16),
                           _buildDetailItem(
@@ -165,13 +140,15 @@ class UserProfileScreen extends StatelessWidget {
                             value: '33 street west subidbazar,sylhet',
                           ),
                           const SizedBox(height: 16),
+                          // Inside the ListView in UserProfileScreen
                           _buildDetailItem(
                             context: context,
                             label: localizations.phoneNumber,
-                            value: '(320) 555-0104',
+                            // Use user.phoneNumber or whatever the field name is in your UserModel
+                            value: user.phoneNumber ?? 'No phone number',
                           ),
                           const SizedBox(height: 24),
-                          
+
                           // Media Shared Section
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -197,7 +174,7 @@ class UserProfileScreen extends StatelessWidget {
                             ],
                           ),
                           const SizedBox(height: 12),
-                          
+
                           // Media Grid
                           Row(
                             children: [
@@ -250,15 +227,11 @@ class UserProfileScreen extends StatelessWidget {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           border: Border.all(
-            color: AppColors.textWhite.withOpacity(0.3),
+            color: AppColors.primaryTeal.withOpacity(0.3),
             width: 2,
           ),
         ),
-        child: Icon(
-          icon,
-          color: AppColors.textWhite,
-          size: 24,
-        ),
+        child: Icon(icon, color: AppColors.primaryTeal, size: 24),
       ),
     );
   }
@@ -305,11 +278,7 @@ class UserProfileScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
         ),
         child: image != null
-            ? Icon(
-                image,
-                color: AppColors.textWhite,
-                size: 32,
-              )
+            ? Icon(image, color: AppColors.textWhite, size: 32)
             : Center(
                 child: Text(
                   count ?? '',
@@ -324,4 +293,3 @@ class UserProfileScreen extends StatelessWidget {
     );
   }
 }
-

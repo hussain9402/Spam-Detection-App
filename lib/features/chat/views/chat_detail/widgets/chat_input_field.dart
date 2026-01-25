@@ -48,6 +48,14 @@ class _ChatInputFieldState extends State<ChatInputField> {
     }
   }
 
+  void _handleVoiceAction() {
+    if (widget.controller.isRecording.value) {
+      widget.controller.stopRecording();
+    } else {
+      widget.controller.startRecording();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final AppLocalizations localizations = AppLocalizations.of(context)!;
@@ -72,7 +80,6 @@ class _ChatInputFieldState extends State<ChatInputField> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 8),
               decoration: BoxDecoration(
-                // FIX: Matching background color to the theme
                 color: isDark
                     ? AppColors.backgroundDarkSurface.withOpacity(0.6)
                     : AppColors.backgroundLightGray,
@@ -88,23 +95,52 @@ class _ChatInputFieldState extends State<ChatInputField> {
                     onPressed: () {},
                   ),
                   Expanded(
-                    child: TextField(
-                      controller: _textController,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                      decoration: InputDecoration(
-                        hintText: localizations.writeYourMessage,
-                        hintStyle: const TextStyle(
-                          color: AppColors.textLightGray,
-                        ),
-                        border: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                      ),
-                      textInputAction: TextInputAction.send,
-                      onSubmitted: (_) => _handleSend(),
-                    ),
+                    child: Obx(() => widget.controller.isRecording.value
+                        ? SizedBox(
+                            height: 40,
+                            child: Row(
+                              children: [
+                                const Text(
+                                  "Recording...",
+                                  style: TextStyle(
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const Spacer(),
+                                Obx(() {
+                                  final duration = widget.controller.recordingDuration.value;
+                                  final minutes = duration ~/ 60;
+                                  final seconds = duration % 60;
+                                  return Text(
+                                    '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}',
+                                    style: const TextStyle(
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  );
+                                }),
+                              ],
+                            ),
+                          )
+                        : TextField(
+                            controller: _textController,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                            decoration: InputDecoration(
+                              hintText: localizations.writeYourMessage,
+                              hintStyle: const TextStyle(
+                                color: AppColors.textLightGray,
+                              ),
+                              border: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                            ),
+                            textInputAction: TextInputAction.send,
+                            onSubmitted: (_) => _handleSend(),
+                          )),
                   ),
                 ],
               ),
@@ -112,19 +148,20 @@ class _ChatInputFieldState extends State<ChatInputField> {
           ),
           const SizedBox(width: 8),
           GestureDetector(
-            onTap: () => _isTyping.value ? _handleSend() : null,
-            child: CircleAvatar(
-              backgroundColor: AppColors.primaryTeal.withAlpha(50),
-              radius: 22,
-              // Obx is ONLY here. It doesn't touch the TextField.
-              child: Obx(
-                () => Icon(
-                  _isTyping.value ? Icons.send : Icons.mic,
-                  color: Colors.white,
-                  size: 22,
-                ),
-              ),
-            ),
+            onTap: () => _isTyping.value ? _handleSend() : _handleVoiceAction(),
+            child: Obx(() => CircleAvatar(
+                  backgroundColor: widget.controller.isRecording.value
+                      ? Colors.red.withAlpha(50)
+                      : AppColors.primaryTeal.withAlpha(50),
+                  radius: 22,
+                  child: Icon(
+                    _isTyping.value
+                        ? Icons.send
+                        : (widget.controller.isRecording.value ? Icons.stop : Icons.mic),
+                    color: widget.controller.isRecording.value ? Colors.red : Colors.white,
+                    size: 22,
+                  ),
+                )),
           ),
         ],
       ),
