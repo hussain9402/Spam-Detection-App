@@ -44,4 +44,7 @@ class AppStrings {
 
   // Common
   static const String or = 'OR';
+  static const String profile = 'Profile';
+  static const String contacts = 'Contacts';
+  static const String Spam = 'Spam';
 }

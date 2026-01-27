@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:spamdetection/core/constants/app_strings.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../controllers/spam_controller.dart';
 import '../../models/spam_model.dart';
@@ -20,29 +21,29 @@ class SpamProtectionScreen extends StatelessWidget {
           children: [
             // Header
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               color: AppColors.headerDarkGreen,
               child: Row(
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.search, color: AppColors.textWhite),
-                    onPressed: () {},
-                  ),
+                  // IconButton(
+                  //   icon: const Icon(Icons.search, color: AppColors.textWhite),
+                  //   onPressed: () {},
+                  // ),
                   const Expanded(
                     child: Text(
-                      'Spam',
+                      AppStrings.Spam,
                       style: TextStyle(
-                        color: AppColors.textWhite,
-                        fontSize: 20,
+                        color: AppColors.primaryTeal,
+                        fontSize: 30,
                         fontWeight: FontWeight.w600,
                       ),
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.more_vert, color: AppColors.textWhite),
-                    onPressed: () {},
-                  ),
+                  // IconButton(
+                  //   icon: const Icon(Icons.more_vert, color: AppColors.textWhite),
+                  //   onPressed: () {},
+                  // ),
                 ],
               ),
             ),
@@ -53,8 +54,8 @@ class SpamProtectionScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Theme.of(context).scaffoldBackgroundColor,
                   borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20),
+                    topLeft: Radius.circular(50),
+                    topRight: Radius.circular(50),
                   ),
                 ),
                 child: SingleChildScrollView(
@@ -67,12 +68,13 @@ class SpamProtectionScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Spam Protection Summary Banner
+                       
                         _buildProtectionBanner(context, controller),
 
                         // Caution Banner
                         _buildCautionBanner(context),
 
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 26),
 
                         // Spam Messages List Header
                         Padding(
@@ -155,7 +157,7 @@ class SpamProtectionScreen extends StatelessWidget {
           color: Theme.of(context).brightness == Brightness.dark
               ? const Color(0xFF2A3A5E)
               : const Color(0xFFEDF2F9),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30),bottomLeft: Radius.circular(8),bottomRight: Radius.circular(8)),
           border: Border.all(
             color: Theme.of(context).brightness == Brightness.dark
                 ? const Color(0xFF4A5A7E)

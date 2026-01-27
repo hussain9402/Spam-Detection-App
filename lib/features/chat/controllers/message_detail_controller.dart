@@ -88,57 +88,65 @@ class MessageDetailController extends GetxController {
 
   // Real-time listener for Firestore messages
   void listenToMessages() {
-    if (chat.value == null) return;
+  if (chat.value == null) return;
 
-    _firestore
-        .collection('chats')
-        .doc(chat.value!.id)
-        .collection('messages')
-        .orderBy('timestamp', descending: false)
-        .snapshots(includeMetadataChanges: true)
-        .listen((snapshot) {
-      final docs = snapshot.docs;
-      
-      final firestoreMessages = docs.map((doc) {
-        final data = doc.data();
-        final String senderNumber = data['senderNumber'] ?? '';
-        final String myNumber = authController.currentUser.value?.phoneNumber ?? '';
+  _firestore
+      .collection('chats')
+      .doc(chat.value!.id)
+      .collection('messages')
+      .orderBy('timestamp', descending: false)
+      .snapshots(includeMetadataChanges: true)
+      .listen((snapshot) {
+    final docs = snapshot.docs;
+    
+    final firestoreMessages = docs.map((doc) {
+      final data = doc.data();
+      final String senderNumber = data['senderNumber'] ?? '';
+      final String myNumber = authController.currentUser.value?.phoneNumber ?? '';
 
-        DateTime msgTime;
-        if (data['timestamp'] == null) {
-          msgTime = DateTime.now();
-        } else {
-          msgTime = (data['timestamp'] as Timestamp).toDate();
-        }
-
-        return MessageModel(
-          id: doc.id,
-          senderId: senderNumber,
-          senderName: senderNumber == myNumber ? 'You' : (chat.value?.name ?? 'Other'),
-          content: data['content'] ?? '',
-          type: data['type'] == 'voice' ? MessageType.voice : (data['type'] == 'image' ? MessageType.image : MessageType.text),
-          timestamp: msgTime,
-          isSent: senderNumber == myNumber,
-          voiceDuration: data['duration'] ?? 0,
-          status: MessageStatus.sent,
-        );
-      }).toList();
-
-      // Merge firestore messages with local failed/sending ones
-      final localOnly = messages.where((m) => m.status != MessageStatus.sent).toList();
-      
-      messages.assignAll(firestoreMessages);
-      
-      for (var local in localOnly) {
-        if (!messages.any((m) => m.id == local.id)) {
-          messages.add(local);
-        }
+      DateTime msgTime;
+      if (data['timestamp'] == null) {
+        msgTime = DateTime.now();
+      } else {
+        msgTime = (data['timestamp'] as Timestamp).toDate();
       }
+
+      return MessageModel(
+        id: doc.id,
+        senderId: senderNumber,
+        senderName: senderNumber == myNumber ? 'You' : (chat.value?.name ?? 'Other'),
+        content: data['content'] ?? '',
+        type: data['type'] == 'voice' ? MessageType.voice : (data['type'] == 'image' ? MessageType.image : MessageType.text),
+        timestamp: msgTime,
+        isSent: senderNumber == myNumber,
+        voiceDuration: data['duration'] ?? 0,
+        status: MessageStatus.sent,
+      );
+    }).toList();
+
+    // --- FIXED MERGE LOGIC ---
+    // Instead of checking IDs, we check if the CONTENT is already in the firestore list.
+    // This prevents the "local temp" message and the "real firestore" message from showing at the same time.
+    final localOnly = messages.where((m) {
+      if (m.status == MessageStatus.sent) return false;
       
-      // Keep sorted by timestamp
-      messages.sort((a, b) => a.timestamp.compareTo(b.timestamp));
-    });
-  }
+      return !firestoreMessages.any((f) => 
+        f.content == m.content && 
+        f.senderId == m.senderId &&
+        f.type == m.type
+      );
+    }).toList();
+    
+    // Clear and update with Firestore data
+    messages.assignAll(firestoreMessages);
+    
+    // Add back only the unique local/failed messages
+    messages.addAll(localOnly);
+    
+    // Final sort
+    messages.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+  });
+}
 
   // --- Voice Recording Methods ---
 

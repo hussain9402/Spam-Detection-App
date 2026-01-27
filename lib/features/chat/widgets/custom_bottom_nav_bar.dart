@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:spamdetection/core/constants/app_strings.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_assets.dart'; // Import your new assets file
 import '../../../core/localization/app_localizations.dart';
@@ -44,17 +45,25 @@ class CustomBottomNavBar extends StatelessWidget {
                 index: 0,
                 isSelected: currentIndex == 0,
               ),
-              _buildNavItem(
-                context: context,
-                iconPath: AppAssets.calls, // Updated to use AppAssets
-                label: localizations.calls,
-                index: 1,
-                isSelected: currentIndex == 1,
-              ),
+             
               _buildNavItem(
                 context: context,
                 iconPath: AppAssets.spam, // Updated to use AppAssets
                 label: 'Spam',
+                index: 1,
+                isSelected: currentIndex == 1,
+              ),
+              //  _buildNavItem(
+              //   context: context,
+              //   iconPath: AppAssets.calls, // Updated to use AppAssets
+              //   label: localizations.calls,
+              //   index: 2,
+              //   isSelected: currentIndex == 2,
+              // ),
+               _buildNavItem(
+                context: context,
+                iconPath: AppAssets.phonebook, // Updated to use AppAssets
+                label: AppStrings.contacts,
                 index: 2,
                 isSelected: currentIndex == 2,
               ),

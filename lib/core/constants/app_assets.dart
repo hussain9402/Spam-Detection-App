@@ -10,6 +10,8 @@ class AppAssets {
   static const String messages = '$_iconPath/Message.png';
   static const String calls = '$_iconPath/Call.png'; // Matches your current filename
   static const String spam = '$_iconPath/spam.png';
+  static const String profile = '$_iconPath/profile.png';
+  static const String phonebook = '$_iconPath/phonebook.png';
   static const String settings = '$_iconPath/settings.png';
   static const String splashlogo = '$_iconPath/app_logo_preview.png';
 

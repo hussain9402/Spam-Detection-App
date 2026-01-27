@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:spamdetection/features/authentication/controllers/auth_controller.dart';
 import 'package:spamdetection/features/chat/views/contacts/contacts_screen.dart';
+import 'package:spamdetection/features/chat/views/profile/user_profile_screen.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../controllers/chat_controller.dart';
@@ -67,39 +69,39 @@ class MessageScreen extends StatelessWidget {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Get.to(() => const ContactsScreen()),
-        backgroundColor: AppColors.primaryTeal.withAlpha(50),
-        child: const Icon(Icons.contacts, color: AppColors.primaryTeal),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () => Get.to(() => const ContactsScreen()),
+      //   backgroundColor: AppColors.primaryTeal.withAlpha(50),
+      //   child: const Icon(Icons.contacts, color: AppColors.primaryTeal),
+      // ),
     );
   }
 
   Widget _buildHeader(BuildContext context, AppLocalizations localizations) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       color: AppColors.headerDarkGreen,
       child: Row(
         children: [
-          IconButton(
-            icon: const Icon(Icons.search, color: AppColors.textWhite),
-            onPressed: () {},
-          ),
+          // IconButton(
+          //   icon: const Icon(Icons.search, color: AppColors.textWhite),
+          //   onPressed: () {Get.to(() =>  UserProfileScreen(user: AuthController().currentUser.value!));},
+          // ),
           Expanded(
             child: Text(
               localizations.home,
               style: const TextStyle(
-                color: AppColors.textWhite,
+                color: AppColors.primaryTeal,
                 fontSize: 30,
                 fontWeight: FontWeight.w600,
               ),
               textAlign: TextAlign.center,
             ),
           ),
-          CircleAvatar(
-            backgroundColor: AppColors.primaryTeal.withAlpha(50),
-            child:  Icon(Icons.person, color: AppColors.primaryTeal),
-          ),
+          // CircleAvatar(
+          //   backgroundColor: AppColors.primaryTeal.withAlpha(50),
+          //   child:  Icon(Icons.person, color: AppColors.primaryTeal),
+          // ),
         ],
       ),
     );

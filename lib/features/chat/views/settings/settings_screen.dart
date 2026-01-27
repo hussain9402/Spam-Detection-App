@@ -26,32 +26,23 @@ class SettingsScreen extends StatelessWidget {
           children: [
             // Header
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               color: AppColors.headerDarkGreen,
               child: Row(
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.search, color: AppColors.textWhite),
-                    onPressed: () {},
-                  ),
+                  
                   Expanded(
                     child: Text(
                       localizations.settings,
                       style: const TextStyle(
-                        color: AppColors.textWhite,
-                        fontSize: 20,
+                        color: AppColors.primaryTeal,
+                        fontSize: 30,
                         fontWeight: FontWeight.w600,
                       ),
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(
-                      Icons.more_vert,
-                      color: AppColors.textWhite,
-                    ),
-                    onPressed: () {},
-                  ),
+                  
                 ],
               ),
             ),
@@ -62,8 +53,8 @@ class SettingsScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Theme.of(context).scaffoldBackgroundColor,
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20),
+                    topLeft: Radius.circular(50),
+                    topRight: Radius.circular(50),
                   ),
                 ),
                 child: Column(

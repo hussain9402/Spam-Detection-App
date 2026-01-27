@@ -14,6 +14,7 @@ class OnboardingScreen extends StatelessWidget {
     final AuthController authController = Get.find<AuthController>();
     
     return SafeArea(
+      bottom: false,
       child: Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           body: Padding(

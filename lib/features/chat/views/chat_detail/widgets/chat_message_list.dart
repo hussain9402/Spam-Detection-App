@@ -46,66 +46,66 @@ class _ChatMessageListState extends State<ChatMessageList> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Obx(() {
-      final messages = widget.controller.messages;
-      final currentCount = messages.length;
+@override
+Widget build(BuildContext context) {
+  return Obx(() {
+    // 1. Get the original list
+    final rawMessages = widget.controller.messages;
 
-      // Auto-scroll when new messages arrive
-      if (currentCount > _previousMessageCount && _previousMessageCount > 0) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          _scrollToBottom();
-        });
-      }
-      _previousMessageCount = currentCount;
+    if (rawMessages.isEmpty) {
+      return const Center(child: Text('No messages yet'));
+    }
 
-      if (messages.isEmpty) {
-        return const Center(child: Text('No messages yet'));
-      }
+    // 2. Filter for unique IDs to stop the "double message" flicker
+    final uniqueMessages = <String, dynamic>{}; 
+    for (var m in rawMessages) {
+      uniqueMessages[m.id] = m; 
+    }
+    
+    // 3. Convert back to list and reverse for the UI
+    final messages = uniqueMessages.values.toList().reversed.toList();
 
-      return ListView.builder(
-        controller: _scrollController,
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
-        itemCount: messages.length,
-        itemBuilder: (context, index) {
-          final message = messages[index];
-          
-          // Logic to determine if we should show a date separator
-          bool showDateHeader = false;
-          if (index == 0) {
-            showDateHeader = true; // Always show date for the first message
-          } else {
-            final prevMessage = messages[index - 1];
-            // If the date (Year/Month/Day) is different from the previous message
-            if (message.timestamp.year != prevMessage.timestamp.year ||
-                message.timestamp.month != prevMessage.timestamp.month ||
-                message.timestamp.day != prevMessage.timestamp.day) {
-              showDateHeader = true;
-            }
+    return ListView.builder(
+      reverse: true, 
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+      itemCount: messages.length,
+      itemBuilder: (context, index) {
+        final message = messages[index];
+        
+        // Date Logic (Correct for Reversed List)
+        bool showDateHeader = false;
+        if (index == messages.length - 1) {
+          showDateHeader = true; 
+        } else {
+          final olderMessage = messages[index + 1];
+          if (message.timestamp.day != olderMessage.timestamp.day ||
+              message.timestamp.month != olderMessage.timestamp.month ||
+              message.timestamp.year != olderMessage.timestamp.year) {
+            showDateHeader = true;
           }
+        }
 
-          return Column(
-            children: [
-              if (showDateHeader) _buildDateHeader(message.timestamp, context),
-              MessageBubble(message: message, controller: widget.controller),
-            ],
-          );
-        },
-      );
-    });
-  }
-
+        return Column(
+          key: ValueKey(message.id), // Crucial for preventing UI glitches
+          children: [
+            if (showDateHeader) _buildDateHeader(message.timestamp, context),
+            MessageBubble(message: message, controller: widget.controller),
+          ],
+        );
+      },
+    );
+  });
+}
   Widget _buildDateHeader(DateTime date, BuildContext context) {
     String dateText = _getFormattedDate(date);
-    
+
     return Center(
       child: Container(
         // margin: const EdgeInsets.symmetric(vertical: 20),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: Theme.of(context).brightness == Brightness.dark 
-              ? Colors.blueGrey.withOpacity(0.2) 
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.blueGrey.withOpacity(0.2)
               : Colors.blue.withOpacity(0.1),
           borderRadius: BorderRadius.circular(10),
         ),
