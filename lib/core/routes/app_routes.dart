@@ -5,5 +5,6 @@ class AppRoutes {
   static const String signup = '/signup';
   static const String home = '/home';
   static const String mainNavigation = '/main';
+  static const String callScreen = '/call';
 }
 

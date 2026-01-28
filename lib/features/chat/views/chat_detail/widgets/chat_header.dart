@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:spamdetection/core/constants/app_colors.dart';
 import 'package:spamdetection/core/localization/app_localizations.dart';
 import 'package:spamdetection/core/routes/app_routes.dart';
+import 'package:spamdetection/features/authentication/controllers/auth_controller.dart';
+import 'package:spamdetection/features/chat/controllers/call_controller.dart';
 import 'package:spamdetection/features/chat/models/chat_model.dart';
+import 'package:spamdetection/features/chat/views/calls/Call_UI.dart';
 import 'package:spamdetection/features/chat/views/chat_detail/ChatInfoScreen.dart';
 
 class ChatHeader extends StatelessWidget {
@@ -30,30 +34,64 @@ class ChatHeader extends StatelessWidget {
         ),
       ),
       child: // Inside ChatHeader Widget build...
-Row(
-  children: [
-    IconButton(
-      icon: const Icon(Icons.arrow_back),
-      onPressed: () => Get.offAllNamed(AppRoutes.mainNavigation),
-    ),
-    // WRAP THIS IN GESTURE DETECTOR
-    Expanded(
-      child: GestureDetector(
-        onTap: () => Get.to(() => ChatInfoScreen(chat: chat)),
-        behavior: HitTestBehavior.opaque,
-        child: Row(
-          children: [
-            _buildProfileStack(context),
-            const SizedBox(width: 12),
-            _buildNameAndStatus(context, localizations),
-          ],
-        ),
+      Row(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => Get.offAllNamed(AppRoutes.mainNavigation),
+          ),
+          // WRAP THIS IN GESTURE DETECTOR
+          Expanded(
+            child: GestureDetector(
+              onTap: () => Get.to(() => ChatInfoScreen(chat: chat)),
+              behavior: HitTestBehavior.opaque,
+              child: Row(
+                children: [
+                  _buildProfileStack(context),
+                  const SizedBox(width: 12),
+                  _buildNameAndStatus(context, localizations),
+                ],
+              ),
+            ),
+          ),
+         IconButton(
+  icon: const Icon(Icons.phone),
+  onPressed: () async {
+    // 1️⃣ Get the CallController
+    final callController = Get.isRegistered<CallController>()
+        ? Get.find<CallController>()
+        : Get.put(CallController());
+
+    // 2️⃣ Get caller and receiver info
+    final callerId = AuthController().cachedPhoneNumber; // your current user
+    final receiverId = chat.phoneNumber ?? '';
+    if (receiverId.isEmpty) return;
+
+    // 3️⃣ Generate a unique callId
+    final callId = DateTime.now().millisecondsSinceEpoch.toString();
+
+    // 4️⃣ Create the call in Firestore
+    await callController.createCall(
+      receiverId: receiverId,
+      isVideo: false,
+    );
+
+    // 5️⃣ Navigate to CallScreen as caller
+    Get.to(
+      () => CallScreen(
+        callId: callId,
+        channelId: 'call_$callId',
+        isVideo: false,
+        isCaller: true, // important for showing cancel button
       ),
-    ),
-    IconButton(icon: const Icon(Icons.phone), onPressed: () {}),
-    IconButton(icon: const Icon(Icons.videocam), onPressed: () {}),
-  ],
+    );
+  },
 ),
+
+
+          IconButton(icon: const Icon(Icons.videocam), onPressed: () {}),
+        ],
+      ),
     );
   }
 
@@ -63,7 +101,7 @@ Row(
         CircleAvatar(
           radius: 22.5,
           backgroundColor: Colors.yellow[700]?.withAlpha(50),
-          child:  Icon(Icons.person, color: Colors.yellow[700], size: 28),
+          child: Icon(Icons.person, color: Colors.yellow[700], size: 28),
         ),
         Positioned(
           right: 0,
@@ -95,7 +133,11 @@ Row(
         children: [
           Text(
             chat.name,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600,color: AppColors.textWhite),
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textWhite,
+            ),
           ),
           Text(
             localizations.activeNow,
