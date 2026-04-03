@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "83248725932",
-    "project_id": "spamdetection-45964",
-    "storage_bucket": "spamdetection-45964.firebasestorage.app"
+    "project_number": "310105529679",
+    "project_id": "sms-spam-app",
+    "storage_bucket": "sms-spam-app.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:83248725932:android:10124cfb89b7aca2c6c409",
+        "mobilesdk_app_id": "1:310105529679:android:dabd25c8df6318fe9b393a",
         "android_client_info": {
           "package_name": "com.example.spamdetection"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCKESeYK8bDPzksAUtYpKZ3N8hNJ9Fo1So"
+          "current_key": "AIzaSyBRBppFYewNlzEbrsQd8numFCry2ohw9uc"
         }
       ],
       "services": {

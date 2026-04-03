@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/utils/validators.dart';
 import 'auth_controller.dart';
@@ -5,6 +6,32 @@ import '../../../core/routes/app_routes.dart';
 
 class SignUpController extends GetxController {
   final AuthController _authController = Get.find<AuthController>();
+
+  late final TextEditingController nameTextController;
+  late final TextEditingController emailTextController;
+  late final TextEditingController phoneTextController;
+  late final TextEditingController passwordTextController;
+  late final TextEditingController confirmPasswordTextController;
+
+  @override
+  void onInit() {
+    super.onInit();
+    nameTextController = TextEditingController();
+    emailTextController = TextEditingController();
+    phoneTextController = TextEditingController();
+    passwordTextController = TextEditingController();
+    confirmPasswordTextController = TextEditingController();
+  }
+
+  @override
+  void onClose() {
+    nameTextController.dispose();
+    emailTextController.dispose();
+    phoneTextController.dispose();
+    passwordTextController.dispose();
+    confirmPasswordTextController.dispose();
+    super.onClose();
+  }
 
   // Form fields
   final RxString name = ''.obs;
@@ -21,20 +48,19 @@ class SignUpController extends GetxController {
   final RxString confirmPasswordError = ''.obs;
   final RxString generalError = ''.obs;
 
-  // Button state
-  RxBool get isSignUpEnabled =>
-      (name.value.isNotEmpty &&
-              email.value.isNotEmpty &&
-              phone.value.isNotEmpty &&
-              password.value.isNotEmpty &&
-              confirmPassword.value.isNotEmpty &&
-              nameError.value.isEmpty &&
-              emailError.value.isEmpty &&
-              phoneError.value.isEmpty &&
-              passwordError.value.isEmpty &&
-              confirmPasswordError.value.isEmpty &&
-              !_authController.isLoading.value)
-          .obs;
+  /// Used inside [Obx]; reads reactive fields so the button rebuilds when they change.
+  bool get isSignUpEnabled =>
+      name.value.isNotEmpty &&
+      email.value.isNotEmpty &&
+      phone.value.isNotEmpty &&
+      password.value.isNotEmpty &&
+      confirmPassword.value.isNotEmpty &&
+      nameError.value.isEmpty &&
+      emailError.value.isEmpty &&
+      phoneError.value.isEmpty &&
+      passwordError.value.isEmpty &&
+      confirmPasswordError.value.isEmpty &&
+      !_authController.isLoading.value;
 
   // ---------------- VALIDATIONS ----------------
   void validateName(String value) {
@@ -89,11 +115,11 @@ class SignUpController extends GetxController {
 
   // ---------------- SIGN UP ----------------
   Future<void> signUp() async {
-    validateName(name.value);
-    validateEmail(email.value);
-    validatePhone(phone.value);
-    validatePassword(password.value);
-    validateConfirmPassword(confirmPassword.value);
+    validateName(nameTextController.text);
+    validateEmail(emailTextController.text);
+    validatePhone(phoneTextController.text);
+    validatePassword(passwordTextController.text);
+    validateConfirmPassword(confirmPasswordTextController.text);
 
     if (nameError.value.isEmpty &&
         emailError.value.isEmpty &&

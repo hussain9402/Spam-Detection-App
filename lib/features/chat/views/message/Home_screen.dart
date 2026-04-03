@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:spamdetection/features/authentication/controllers/auth_controller.dart';
 import 'package:spamdetection/features/chat/views/contacts/contacts_screen.dart';
-import 'package:spamdetection/features/chat/views/profile/user_profile_screen.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../controllers/chat_controller.dart';
@@ -169,6 +167,16 @@ class MessageScreen extends StatelessWidget {
                         ),
                       if (chat.lastMessage.toLowerCase().contains('voice message') ||
                           chat.lastMessage.contains('🎤'))
+                        const SizedBox(width: 4),
+                      if (chat.lastMessage.contains('📷') ||
+                          chat.lastMessage.toLowerCase().contains('photo'))
+                        const Icon(
+                          Icons.image_outlined,
+                          size: 14,
+                          color: AppColors.primaryTeal,
+                        ),
+                      if (chat.lastMessage.contains('📷') ||
+                          chat.lastMessage.toLowerCase().contains('photo'))
                         const SizedBox(width: 4),
                       Expanded(
                         child: Text(

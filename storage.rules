@@ -1,0 +1,20 @@
+rules_version = '2';
+
+// MUST PUBLISH: Firebase Console → Build → Storage → Rules → Publish
+// Or: firebase deploy --only storage   (from this folder, correct project)
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // All chat media (voice, images, future folders) under chats/
+    // Do not use request.resource.size on write — it is often unset at upload start
+    // and causes 403 "Permission denied" for resumable uploads.
+    match /chats/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

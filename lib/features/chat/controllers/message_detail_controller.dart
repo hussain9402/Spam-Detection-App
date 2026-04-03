@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:path_provider/path_provider.dart';
@@ -154,10 +157,15 @@ class MessageDetailController extends GetxController {
     try {
       if (await _recorder.hasPermission()) {
         final directory = await getApplicationDocumentsDirectory();
-        final path = '${directory.path}/recording_${DateTime.now().millisecondsSinceEpoch}.m4a';
-        
-        const config = RecordConfig();
-        
+        final path =
+            '${directory.path}/recording_${DateTime.now().millisecondsSinceEpoch}.wav';
+
+        const config = RecordConfig(
+          encoder: AudioEncoder.wav,
+          sampleRate: 44100,
+          numChannels: 1,
+        );
+
         await _recorder.start(config, path: path);
         isRecording.value = true;
         recordingPath.value = path;
@@ -264,6 +272,14 @@ class MessageDetailController extends GetxController {
     print("DEBUG: Updating chat with lastMessage: $lastMessageText, duration: $duration");
     
     try {
+      if (!await file.exists()) {
+        throw Exception('Voice file missing at $path');
+      }
+      final len = await file.length();
+      if (len == 0) {
+        throw Exception('Voice file is empty (0 bytes)');
+      }
+
       // Update chat document first so duration shows immediately
       await _firestore.collection('chats').doc(chatId).set({
         'participants': [myPhone, otherPhone],
@@ -272,15 +288,20 @@ class MessageDetailController extends GetxController {
         'otherUserName': chat.value!.name,
       }, SetOptions(merge: true));
 
-      // 3. Upload to Firebase Storage
-      final String fileName = 'voice_${DateTime.now().millisecondsSinceEpoch}.m4a';
+      final String fileName =
+          'voice_${DateTime.now().millisecondsSinceEpoch}.wav';
       final Reference ref = _storage.ref().child('chats/$chatId/voice/$fileName');
-      final UploadTask uploadTask = ref.putFile(file);
-      
+
+      final metadata = SettableMetadata(
+        contentType: 'audio/wav',
+        customMetadata: {'durationSeconds': '$duration'},
+      );
+
+      final UploadTask uploadTask = ref.putFile(file, metadata);
+
       final TaskSnapshot snapshot = await uploadTask;
       final String downloadUrl = await snapshot.ref.getDownloadURL();
 
-      // 4. Send the message to Firestore
       await _firestore.collection('chats').doc(chatId).collection('messages').add({
         'senderNumber': myPhone,
         'content': downloadUrl,
@@ -289,18 +310,194 @@ class MessageDetailController extends GetxController {
         'duration': duration,
       });
 
-      // Remove local temp message (Firestore listener will bring the real one)
       messages.removeWhere((m) => m.id == tempId);
-
-    } catch (e) {
-      print("Error sending voice message: $e");
-      // Update local message to failed, but keep the chat document updated with duration
+    } on FirebaseException catch (e) {
+      print('Voice upload FirebaseException [${e.code}]: ${e.message}');
+      final hint = e.code == 'unauthorized' || e.code == 'permission-denied'
+          ? ' Allow Storage uploads in Firebase Console (storage.rules) and run: firebase deploy --only storage'
+          : '';
+      Get.snackbar(
+        'Voice upload failed',
+        '${e.code}: ${e.message}$hint',
+        snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 6),
+      );
       int index = messages.indexWhere((m) => m.id == tempId);
       if (index != -1) {
         messages[index] = messages[index].copyWith(status: MessageStatus.failed);
-        _saveLocalFailedMessages(); // Save to local storage
+        _saveLocalFailedMessages();
       }
-      // Chat document already has the duration, so it will show in the list
+    } catch (e) {
+      print('Error sending voice message: $e');
+      Get.snackbar(
+        'Voice message failed',
+        e.toString(),
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      int index = messages.indexWhere((m) => m.id == tempId);
+      if (index != -1) {
+        messages[index] = messages[index].copyWith(status: MessageStatus.failed);
+        _saveLocalFailedMessages();
+      }
+    }
+  }
+
+  static String _imageFileExtension(String path) {
+    final dot = path.lastIndexOf('.');
+    if (dot == -1 || dot == path.length - 1) return 'jpg';
+    final e = path.substring(dot + 1).toLowerCase();
+    if (e == 'jpeg' || e == 'jpg') return 'jpg';
+    if (e == 'png' || e == 'webp' || e == 'heic') return e;
+    return 'jpg';
+  }
+
+  static String _imageContentType(String ext) {
+    switch (ext) {
+      case 'png':
+        return 'image/png';
+      case 'webp':
+        return 'image/webp';
+      case 'heic':
+        return 'image/heic';
+      default:
+        return 'image/jpeg';
+    }
+  }
+
+  /// Opens system image picker (images only). Uses [file_picker] instead of image_picker to avoid
+  /// Android Pigeon errors: `Unable to establish connection on channel ... ImagePickerApi.pickImages`.
+  Future<void> pickAndSendImage() async {
+    if (chat.value == null) return;
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.image,
+        allowMultiple: false,
+        withData: true,
+      );
+      if (result == null || result.files.isEmpty) return;
+
+      final picked = result.files.single;
+      if (picked.path != null && picked.path!.isNotEmpty) {
+        await sendImageMessage(picked.path!);
+        return;
+      }
+
+      final b = picked.bytes;
+      if (b == null || b.isEmpty) {
+        Get.snackbar(
+          'Image',
+          'Could not read the selected image. Try another photo.',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return;
+      }
+      final dir = await getTemporaryDirectory();
+      final ext = (picked.extension ?? 'jpg').toLowerCase();
+      final safeExt = ['jpg', 'jpeg', 'png', 'webp', 'heic'].contains(ext)
+          ? (ext == 'jpeg' ? 'jpg' : ext)
+          : 'jpg';
+      final tempFile = File(
+        '${dir.path}/chat_pick_${DateTime.now().millisecondsSinceEpoch}.$safeExt',
+      );
+      await tempFile.writeAsBytes(b);
+      await sendImageMessage(tempFile.path);
+    } catch (e) {
+      print('pickAndSendImage error: $e');
+      Get.snackbar(
+        'Image',
+        'Could not open gallery: $e',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+
+  Future<void> sendImageMessage(String path) async {
+    if (chat.value == null) return;
+
+    final String chatId = chat.value!.id;
+    final String myPhone = authController.currentUser.value?.phoneNumber ?? '';
+    final String otherPhone = chat.value!.phoneNumber ?? '';
+    final File file = File(path);
+    final String tempId = 'temp_${DateTime.now().millisecondsSinceEpoch}';
+    const lastMessageText = '📷 Photo';
+
+    final localMsg = MessageModel(
+      id: tempId,
+      senderId: myPhone,
+      senderName: 'You',
+      content: path,
+      type: MessageType.image,
+      timestamp: DateTime.now(),
+      isSent: true,
+      status: MessageStatus.sending,
+      localPath: path,
+    );
+    messages.add(localMsg);
+    messages.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+
+    try {
+      if (!await file.exists()) {
+        throw Exception('Image file missing at $path');
+      }
+      final len = await file.length();
+      if (len == 0) throw Exception('Image file is empty');
+
+      await _firestore.collection('chats').doc(chatId).set({
+        'participants': [myPhone, otherPhone],
+        'lastMessage': lastMessageText,
+        'lastMessageTime': FieldValue.serverTimestamp(),
+        'otherUserName': chat.value!.name,
+      }, SetOptions(merge: true));
+
+      final ext = _imageFileExtension(path);
+      final fileName = 'img_${DateTime.now().millisecondsSinceEpoch}.$ext';
+      final Reference ref =
+          _storage.ref().child('chats/$chatId/images/$fileName');
+
+      final metadata = SettableMetadata(
+        contentType: _imageContentType(ext),
+      );
+
+      final uploadTask = ref.putFile(file, metadata);
+      final snapshot = await uploadTask;
+      final downloadUrl = await snapshot.ref.getDownloadURL();
+
+      await _firestore.collection('chats').doc(chatId).collection('messages').add({
+        'senderNumber': myPhone,
+        'content': downloadUrl,
+        'timestamp': FieldValue.serverTimestamp(),
+        'type': 'image',
+      });
+
+      messages.removeWhere((m) => m.id == tempId);
+    } on FirebaseException catch (e) {
+      print('Image upload FirebaseException [${e.code}]: ${e.message}');
+      final hint = e.code == 'unauthorized' || e.code == 'permission-denied'
+          ? ' Check Storage rules for chats/{chatId}/images/ and deploy.'
+          : '';
+      Get.snackbar(
+        'Image upload failed',
+        '${e.code}: ${e.message}$hint',
+        snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 6),
+      );
+      final index = messages.indexWhere((m) => m.id == tempId);
+      if (index != -1) {
+        messages[index] = messages[index].copyWith(status: MessageStatus.failed);
+        _saveLocalFailedMessages();
+      }
+    } catch (e) {
+      print('Error sending image: $e');
+      Get.snackbar(
+        'Image failed',
+        e.toString(),
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      final index = messages.indexWhere((m) => m.id == tempId);
+      if (index != -1) {
+        messages[index] = messages[index].copyWith(status: MessageStatus.failed);
+        _saveLocalFailedMessages();
+      }
     }
   }
 
@@ -316,8 +513,10 @@ class MessageDetailController extends GetxController {
     
     final messageToResend = messages[messageIndex];
     
-    if (messageToResend.localPath == null && messageToResend.type == MessageType.voice) {
-      print("DEBUG: Voice message has no local path, cannot resend");
+    if (messageToResend.localPath == null &&
+        (messageToResend.type == MessageType.voice ||
+            messageToResend.type == MessageType.image)) {
+      print("DEBUG: Media message has no local path, cannot resend");
       return;
     }
     
@@ -344,6 +543,9 @@ class MessageDetailController extends GetxController {
     if (messageType == MessageType.voice && localPath != null) {
       print("DEBUG: Resending voice message with duration: $duration, path: $localPath");
       await sendVoiceMessage(localPath, duration);
+    } else if (messageType == MessageType.image && localPath != null) {
+      print("DEBUG: Resending image path: $localPath");
+      await sendImageMessage(localPath);
     } else if (messageType == MessageType.text) {
       print("DEBUG: Resending text message: $content");
       messageText.value = content;

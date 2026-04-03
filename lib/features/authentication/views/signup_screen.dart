@@ -15,12 +15,6 @@ class SignUpScreen extends StatelessWidget {
     final SignUpController controller = Get.put(SignUpController());
     final AuthController authController = Get.find<AuthController>();
 
-    final nameController = TextEditingController();
-    final emailController = TextEditingController();
-    final phoneController = TextEditingController();
-    final passwordController = TextEditingController();
-    final confirmPasswordController = TextEditingController();
-
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
@@ -28,62 +22,52 @@ class SignUpScreen extends StatelessWidget {
       // 1. Prevents the screen from moving up when keyboard opens, 
       // keeping the loader in the true center of the glass.
       resizeToAvoidBottomInset: false, 
-      body: Obx(
-        () => Stack(
-          children: [
-            // --- MAIN UI ---
-            SafeArea(
-              bottom: false,
-              child: Column(
-                children: [
-                  // --- 1. Top Header Section ---
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-                    width: double.infinity,
-                    child: Center(
-                      child: Text(
-                        AppStrings.signUpTitle,
-                        style: const TextStyle(
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textBlack,
-                        ),
+      body: Stack(
+        children: [
+          // --- MAIN UI (no Obx: text lives in controllers that persist across rebuilds) ---
+          SafeArea(
+            bottom: false,
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                  width: double.infinity,
+                  child: Center(
+                    child: Text(
+                      AppStrings.signUpTitle,
+                      style: const TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textBlack,
                       ),
                     ),
                   ),
-
-                  // --- 2. Main Content Card ---
-                  Expanded(
-                    child: Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(50),
-                          topRight: Radius.circular(50),
-                        ),
+                ),
+                Expanded(
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).scaffoldBackgroundColor,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(50),
+                        topRight: Radius.circular(50),
                       ),
-                      child: SingleChildScrollView(
-                        // 2. Adjust padding so the user can still scroll to see 
-                        // bottom fields when keyboard is visible
-                        padding: EdgeInsets.only(
-                          left: 24.0,
-                          right: 24.0,
-                          top: 24.0,
-                          bottom: MediaQuery.of(context).viewInsets.bottom + 24.0,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 10),
-                            // Form Fields
-                            _buildFields(controller, nameController, emailController, 
-                                        phoneController, passwordController, confirmPasswordController),
-                            
-                            const SizedBox(height: 32),
-
-                            // Sign Up Button (Clean logic without inner loader)
-                            SizedBox(
+                    ),
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.only(
+                        left: 24.0,
+                        right: 24.0,
+                        top: 24.0,
+                        bottom: MediaQuery.of(context).viewInsets.bottom + 24.0,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 10),
+                          Obx(() => _buildFields(controller)),
+                          const SizedBox(height: 32),
+                          Obx(
+                            () => SizedBox(
                               width: double.infinity,
                               height: 55,
                               child: ElevatedButton(
@@ -95,7 +79,7 @@ class SignUpScreen extends StatelessWidget {
                                     side: const BorderSide(color: AppColors.primaryTeal, width: 1.5),
                                   ),
                                 ),
-                                onPressed: controller.isSignUpEnabled.value
+                                onPressed: controller.isSignUpEnabled
                                     ? () => controller.signUp()
                                     : null,
                                 child: const Text(
@@ -104,48 +88,45 @@ class SignUpScreen extends StatelessWidget {
                                 ),
                               ),
                             ),
-
-                            const SizedBox(height: 24),
-
-                            // Footer
-                            _buildFooter(authController, colorScheme),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // --- 3. FULL SCREEN OVERLAY ---
-            if (authController.isLoading.value)
-              Positioned.fill(
-                child: AbsorbPointer( // Disables all clicks on the form
-                  child: Container(
-                    color: Colors.black.withOpacity(0.5), // Dim effect
-                    child: Center(
-                      child: LoadingAnimationWidget.waveDots(
-                        color: AppColors.primaryTeal,
-                        size: 40,
+                          ),
+                          const SizedBox(height: 24),
+                          _buildFooter(authController, colorScheme),
+                        ],
                       ),
                     ),
                   ),
                 ),
-              ),
-          ],
-        ),
+              ],
+            ),
+          ),
+          Obx(
+            () => authController.isLoading.value
+                ? Positioned.fill(
+                    child: AbsorbPointer(
+                      child: Container(
+                        color: Colors.black.withOpacity(0.5),
+                        child: Center(
+                          child: LoadingAnimationWidget.waveDots(
+                            color: AppColors.primaryTeal,
+                            size: 40,
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                : const SizedBox.shrink(),
+          ),
+        ],
       ),
     );
   }
 
-  // Helper methods to keep the build method clean
-  Widget _buildFields(SignUpController controller, var name, var email, var phone, var pass, var confirm) {
+  Widget _buildFields(SignUpController controller) {
     return Column(
       children: [
         CustomTextField(
           label: AppStrings.yourName,
-          controller: name,
+          controller: controller.nameTextController,
           hintText: AppStrings.nameHint,
           errorText: controller.nameError.value.isEmpty ? null : controller.nameError.value,
           onChanged: controller.validateName,
@@ -155,7 +136,7 @@ class SignUpScreen extends StatelessWidget {
           label: AppStrings.yourEmail,
           hintText: AppStrings.emailHint,
           keyboardType: TextInputType.emailAddress,
-          controller: email,
+          controller: controller.emailTextController,
           errorText: controller.emailError.value.isEmpty ? null : controller.emailError.value,
           onChanged: controller.validateEmail,
         ),
@@ -164,7 +145,7 @@ class SignUpScreen extends StatelessWidget {
           label: AppStrings.yourphone,
           hintText: AppStrings.phoneHint,
           keyboardType: TextInputType.phone,
-          controller: phone,
+          controller: controller.phoneTextController,
           errorText: controller.phoneError.value.isEmpty ? null : controller.phoneError.value,
           onChanged: controller.validatePhone,
         ),
@@ -173,7 +154,7 @@ class SignUpScreen extends StatelessWidget {
           label: AppStrings.password,
           hintText: AppStrings.passwordHint,
           obscureText: true,
-          controller: pass,
+          controller: controller.passwordTextController,
           errorText: controller.passwordError.value.isEmpty ? null : controller.passwordError.value,
           onChanged: controller.validatePassword,
         ),
@@ -182,7 +163,7 @@ class SignUpScreen extends StatelessWidget {
           label: AppStrings.confirmPassword,
           obscureText: true,
           hintText: AppStrings.confirmPasswordHint,
-          controller: confirm,
+          controller: controller.confirmPasswordTextController,
           errorText: controller.confirmPasswordError.value.isEmpty ? null : controller.confirmPasswordError.value,
           onChanged: controller.validateConfirmPassword,
         ),

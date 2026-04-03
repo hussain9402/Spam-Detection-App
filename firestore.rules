@@ -1,0 +1,37 @@
+rules_version = '2';
+
+// ---------------------------------------------------------------------------
+// IMPORTANT: Editing this file does NOTHING until rules are PUBLISHED.
+// - Firebase Console → Firestore Database → Rules → Paste → Publish
+// - Or: firebase deploy --only firestore:rules (project: sms-spam-app)
+//
+// If `allow read` on users/{userId} is ONLY for request.auth.uid == userId,
+// then collection("users").get() cannot return all users — it will FAIL or
+// behave incorrectly. You need: allow read: if request.auth != null;
+// ---------------------------------------------------------------------------
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Profiles: any signed-in user can read (needed to match device contacts to app users).
+    // Only the account owner can create/update/delete their document.
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow create, update: if request.auth != null && request.auth.uid == userId;
+      allow delete: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Chats: participants are phone strings; auth users still need read/write for messaging.
+    // Tighten later (e.g. map uid → phone in rules or use Cloud Functions).
+    match /chats/{chatId} {
+      allow read, write: if request.auth != null;
+      match /messages/{messageId} {
+        allow read, write: if request.auth != null;
+      }
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -103,12 +103,11 @@ class _MessageBubbleState extends State<MessageBubble> {
                     bottomRight: Radius.circular(4),
                   ),
                 ),
-                child: widget.message.type == MessageType.voice
-                    ? _buildVoiceMessage()
-                    : Text(
-                        widget.message.content,
-                        style: const TextStyle(color: AppColors.textWhite, fontSize: 14),
-                      ),
+                child: _buildMessageContent(
+                  context,
+                  textColor: AppColors.textWhite,
+                  isSent: true,
+                ),
               ),
             ),
           ],
@@ -175,15 +174,11 @@ class _MessageBubbleState extends State<MessageBubble> {
                     bottomRight: Radius.circular(16),
                   ),
                 ),
-                child: widget.message.type == MessageType.voice
-                    ? _buildVoiceMessage()
-                    : Text(
-                        widget.message.content,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface,
-                          fontSize: 14,
-                        ),
-                      ),
+                child: _buildMessageContent(
+                  context,
+                  textColor: Theme.of(context).colorScheme.onSurface,
+                  isSent: false,
+                ),
               ),
               const SizedBox(height: 4),
               Text(
@@ -194,6 +189,103 @@ class _MessageBubbleState extends State<MessageBubble> {
           ),
         ),
       ],
+    );
+  }
+
+  static const double _imageMaxSide = 220;
+
+  Widget _buildMessageContent(
+    BuildContext context, {
+    required Color textColor,
+    required bool isSent,
+  }) {
+    switch (widget.message.type) {
+      case MessageType.voice:
+        return _buildVoiceMessage();
+      case MessageType.image:
+        return _buildImageMessage(textColor: textColor, isSent: isSent);
+      case MessageType.text:
+        return Text(
+          widget.message.content,
+          style: TextStyle(color: textColor, fontSize: 14),
+        );
+    }
+  }
+
+  Widget _buildImageMessage({required Color textColor, required bool isSent}) {
+    final String? url = widget.message.content.startsWith('http')
+        ? widget.message.content
+        : null;
+    final String? filePath = url == null
+        ? (widget.message.localPath ?? widget.message.content)
+        : null;
+
+    Widget child;
+    if (url != null) {
+      child = Image.network(
+        url,
+        width: _imageMaxSide,
+        height: _imageMaxSide,
+        fit: BoxFit.cover,
+        loadingBuilder: (context, w, ev) {
+          if (ev == null) return w;
+          return SizedBox(
+            width: _imageMaxSide,
+            height: _imageMaxSide,
+            child: Center(
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: isSent ? Colors.white70 : AppColors.primaryTeal,
+              ),
+            ),
+          );
+        },
+        errorBuilder: (_, __, ___) => _imageErrorPlaceholder(textColor),
+      );
+    } else if (filePath != null &&
+        filePath.isNotEmpty &&
+        File(filePath).existsSync()) {
+      child = Image.file(
+        File(filePath),
+        width: _imageMaxSide,
+        height: _imageMaxSide,
+        fit: BoxFit.cover,
+      );
+    } else {
+      child = _imageErrorPlaceholder(textColor);
+    }
+
+    final canOpen = url != null ||
+        (filePath != null &&
+            filePath.isNotEmpty &&
+            File(filePath).existsSync());
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: canOpen
+            ? () => _FullScreenImageViewer.open(
+                  context,
+                  imageUrl: url,
+                  imagePath: url == null ? filePath : null,
+                )
+            : null,
+        borderRadius: BorderRadius.circular(8),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: child,
+        ),
+      ),
+    );
+  }
+
+  Widget _imageErrorPlaceholder(Color textColor) {
+    return Container(
+      width: _imageMaxSide,
+      height: 120,
+      color: Colors.black26,
+      alignment: Alignment.center,
+      child: Icon(Icons.broken_image_outlined, color: textColor.withOpacity(0.7)),
     );
   }
 
@@ -252,6 +344,128 @@ class _MessageBubbleState extends State<MessageBubble> {
           );
         }),
       ],
+    );
+  }
+}
+
+/// Fullscreen image with pinch-zoom; opened from chat thumbnails.
+class _FullScreenImageViewer extends StatelessWidget {
+  const _FullScreenImageViewer({
+    required this.imageUrl,
+    required this.imagePath,
+  });
+
+  final String? imageUrl;
+  final String? imagePath;
+
+  static void open(
+    BuildContext context, {
+    String? imageUrl,
+    String? imagePath,
+  }) {
+    final hasUrl = imageUrl != null && imageUrl.startsWith('http');
+    final hasFile = imagePath != null &&
+        imagePath.isNotEmpty &&
+        File(imagePath).existsSync();
+    if (!hasUrl && !hasFile) return;
+
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        fullscreenDialog: true,
+        builder: (context) => _FullScreenImageViewer(
+          imageUrl: hasUrl ? imageUrl : null,
+          imagePath: hasUrl ? null : imagePath,
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.close),
+          onPressed: () => Navigator.of(context).maybePop(),
+        ),
+      ),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final w = constraints.maxWidth;
+          final h = constraints.maxHeight;
+          if (imageUrl != null) {
+            return InteractiveViewer(
+              minScale: 0.5,
+              maxScale: 5,
+              child: Center(
+                child: Image.network(
+                  imageUrl!,
+                  width: w,
+                  height: h,
+                  fit: BoxFit.contain,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return SizedBox(
+                      width: w,
+                      height: h,
+                      child: const Center(
+                        child: CircularProgressIndicator(
+                          color: Colors.white54,
+                          strokeWidth: 2,
+                        ),
+                      ),
+                    );
+                  },
+                  errorBuilder: (_, __, ___) => SizedBox(
+                    width: w,
+                    height: h,
+                    child: const Center(
+                      child: Icon(
+                        Icons.broken_image_outlined,
+                        color: Colors.white38,
+                        size: 64,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }
+          final path = imagePath;
+          if (path != null && File(path).existsSync()) {
+            return InteractiveViewer(
+              minScale: 0.5,
+              maxScale: 5,
+              child: Center(
+                child: Image.file(
+                  File(path),
+                  width: w,
+                  height: h,
+                  fit: BoxFit.contain,
+                  errorBuilder: (_, __, ___) => SizedBox(
+                    width: w,
+                    height: h,
+                    child: const Center(
+                      child: Icon(
+                        Icons.broken_image_outlined,
+                        color: Colors.white38,
+                        size: 64,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }
+          return const Center(
+            child: Icon(Icons.broken_image_outlined, color: Colors.white38, size: 64),
+          );
+        },
+      ),
     );
   }
 }
