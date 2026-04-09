@@ -177,25 +177,25 @@ class SettingsScreen extends StatelessWidget {
                             subtitle: localizations.helpSubtitle,
                             onTap: () {},
                           ),
-                          Obx(
-                            () => _buildSettingsItem(
-                              context: context,
-                              icon: Icons.palette_outlined,
-                              title: localizations.appTheme,
-                              subtitle: themeController.getCurrentThemeName(
-                                localizations.lightTheme,
-                                localizations.darkTheme,
-                                localizations.systemTheme,
-                              ),
-                              onTap: () {
-                                _showThemeDialog(
-                                  context,
-                                  themeController,
-                                  localizations,
-                                );
-                              },
-                            ),
-                          ),
+                          // Obx(
+                          //   () => _buildSettingsItem(
+                          //     context: context,
+                          //     icon: Icons.palette_outlined,
+                          //     title: localizations.appTheme,
+                          //     subtitle: themeController.getCurrentThemeName(
+                          //       localizations.lightTheme,
+                          //       localizations.darkTheme,
+                          //       localizations.systemTheme,
+                          //     ),
+                          //     onTap: () {
+                          //       _showThemeDialog(
+                          //         context,
+                          //         themeController,
+                          //         localizations,
+                          //       );
+                          //     },
+                          //   ),
+                          // ),
                           _buildSettingsItem(
                             context: context,
                             icon: Icons.person_add_outlined,

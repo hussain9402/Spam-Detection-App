@@ -67,11 +67,11 @@ class MessageScreen extends StatelessWidget {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Get.to(() => const ContactsScreen()),
-        backgroundColor: AppColors.primaryTeal.withAlpha(50),
-        child: const Icon(Icons.contacts, color: AppColors.primaryTeal),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () => Get.to(() => const ContactsScreen()),
+      //   backgroundColor: AppColors.primaryTeal.withAlpha(50),
+      //   child: const Icon(Icons.contacts, color: AppColors.primaryTeal),
+      // ),
     );
   }
 
