@@ -4,6 +4,7 @@ import 'package:spamdetection/core/constants/app_strings.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../controllers/spam_controller.dart';
 import '../../models/spam_model.dart';
+import 'spam_chat_thread_screen.dart';
 
 class SpamProtectionScreen extends StatelessWidget {
   const SpamProtectionScreen({super.key});
@@ -58,51 +59,100 @@ class SpamProtectionScreen extends StatelessWidget {
                     topRight: Radius.circular(50),
                   ),
                 ),
-                child: SingleChildScrollView(
-                  child: Obx(() {
-                    if (controller.spamMessages.isEmpty) {
-                      return _buildEmptyState(context);
+                child: Obx(() {
+                    controller.highlightedSpamMessageId.value;
+                    controller.spamMessages.length;
+                    if (controller.spamChats.isEmpty) {
+                      return LayoutBuilder(
+                        builder: (context, constraints) {
+                          return RefreshIndicator(
+                            onRefresh: () async {
+                              controller.refreshSpamInbox();
+                              await Future<void>.delayed(
+                                const Duration(milliseconds: 450),
+                              );
+                            },
+                            child: SingleChildScrollView(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  minHeight: constraints.maxHeight,
+                                ),
+                                child: _buildEmptyState(context),
+                              ),
+                            ),
+                          );
+                        },
+                      );
                     }
 
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Spam Protection Summary Banner
-                       
-                        _buildProtectionBanner(context, controller),
+                    return RefreshIndicator(
+                      onRefresh: () async {
+                        controller.refreshSpamInbox();
+                        await Future<void>.delayed(
+                          const Duration(milliseconds: 450),
+                        );
+                      },
+                      child: SingleChildScrollView(
+                        child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Spam Protection Summary Banner
 
-                        // Caution Banner
-                        _buildCautionBanner(context),
+                          _buildProtectionBanner(context, controller),
 
-                        const SizedBox(height: 26),
+                          // Caution Banner
+                          _buildCautionBanner(context),
 
-                        // Spam Messages List Header
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: Text(
-                            'Blocked Messages',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Theme.of(context).colorScheme.onSurface,
+                          const SizedBox(height: 26),
+
+                          // One row per chat that has spam
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                            child: Text(
+                              'Chats with spam',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
                             ),
                           ),
+
+                          const SizedBox(height: 12),
+
+                          ...controller.spamChats.map((SpamChatSummary summary) {
+                            final String? hid =
+                                controller.highlightedSpamMessageId.value;
+                            String? highlightChatId;
+                            if (hid != null) {
+                              for (final SpamMessage m
+                                  in controller.spamMessages) {
+                                if (m.id == hid) {
+                                  highlightChatId = m.chatId;
+                                  break;
+                                }
+                              }
+                            }
+                            final bool isHighlight =
+                                highlightChatId != null &&
+                                highlightChatId == summary.chatId;
+                            return _buildSpamChatRow(
+                              context,
+                              controller,
+                              summary,
+                              isHighlight: isHighlight,
+                            );
+                          }),
+
+                          const SizedBox(height: 16),
+                        ],
                         ),
-
-                        const SizedBox(height: 12),
-
-                        // List of Spam Items
-                        ...controller.spamMessages.map((spam) {
-                          return _buildSpamItem(context, spam, controller);
-                        }),
-
-                        const SizedBox(height: 16),
-                      ],
+                      ),
                     );
                   }),
                 ),
               ),
-            ),
           ],
         ),
       ),
@@ -232,91 +282,93 @@ class SpamProtectionScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSpamItem(BuildContext context, SpamMessage spam, SpamController controller) {
+  Widget _buildSpamChatRow(
+    BuildContext context,
+    SpamController controller,
+    SpamChatSummary summary, {
+    required bool isHighlight,
+  }) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final String countLine = summary.spamMessageCount == 1
+        ? '1 spam'
+        : '${summary.spamMessageCount} spam';
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Theme.of(context).brightness == Brightness.dark
-              ? const Color(0xFF2A2A2A)
-              : Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.grey.withOpacity(0.3)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+      key: isHighlight ? controller.spamChatRowHighlightKey : null,
+      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(10),
+          onTap: () {
+            Get.to<void>(
+              () => SpamChatThreadScreen(
+                chatId: summary.chatId,
+                chatTitle: summary.displayTitle,
+              ),
+              transition: Transition.rightToLeft,
+            );
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            decoration: BoxDecoration(
+              color: isHighlight
+                  ? (isDark
+                      ? const Color(0xFF2D3A1F)
+                      : const Color(0xFFFFF8E1))
+                  : (isDark ? const Color(0xFF2A2A2A) : Colors.white),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: isHighlight
+                    ? const Color(0xFFFFA000)
+                    : Colors.grey.withOpacity(0.3),
+                width: isHighlight ? 2.5 : 1,
+              ),
+            ),
+            child: Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: _getCategoryColor(spam.category),
-                  child: Text(spam.senderName[0].toUpperCase(), 
-                    style: const TextStyle(color: Colors.white)),
+                  backgroundColor: Colors.grey.shade600,
+                  child: Text(
+                    summary.displayTitle.isNotEmpty
+                        ? summary.displayTitle[0].toUpperCase()
+                        : '?',
+                    style: const TextStyle(color: Colors.white),
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(spam.senderName, style: const TextStyle(fontWeight: FontWeight.bold)),
-                      Text(spam.senderPhone, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                      Text(
+                        summary.displayTitle,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        countLine,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey,
+                        ),
+                      ),
                     ],
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.delete_outline, color: Colors.red),
-                  onPressed: () => controller.deleteSpamMessage(spam.id),
+                Icon(
+                  Icons.chevron_right,
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.45),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
-            Text(spam.messageContent, maxLines: 2, overflow: TextOverflow.ellipsis),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(_getTimeString(spam.receivedTime), style: const TextStyle(fontSize: 11)),
-                _buildRiskBadge(spam),
-              ],
-            )
-          ],
+          ),
         ),
       ),
     );
-  }
-
-  Widget _buildRiskBadge(SpamMessage spam) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: spam.riskLevel.color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(
-        spam.riskLevel.label,
-        style: TextStyle(fontSize: 11, color: spam.riskLevel.color, fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-
-  // --- Logic Helpers ---
-
-  String _getTimeString(DateTime time) {
-    final now = DateTime.now();
-    final difference = now.difference(time);
-    if (difference.inDays == 0) return 'Today';
-    if (difference.inDays == 1) return 'Yesterday';
-    if (difference.inDays < 7) return '${difference.inDays} days ago';
-    return 'Older than a week';
-  }
-
-  Color _getCategoryColor(String category) {
-    switch (category.toLowerCase()) {
-      case 'unknown number': return Colors.purple;
-      case 'promotional': return Colors.blue;
-      case 'spam bot': return Colors.green;
-      default: return Colors.grey;
-    }
   }
 }

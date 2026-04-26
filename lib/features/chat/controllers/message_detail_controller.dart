@@ -26,6 +26,10 @@ class MessageDetailController extends GetxController {
   final RxBool isActive = true.obs; 
   final RxString messageText = ''.obs;
 
+  /// Long-press to select messages; delete from app bar.
+  final RxBool isSelectionMode = false.obs;
+  final RxList<String> selectedMessageIds = <String>[].obs;
+
   // Recording states
   final RxBool isRecording = false.obs;
   final RxString recordingPath = ''.obs;
@@ -39,6 +43,26 @@ class MessageDetailController extends GetxController {
   void onClose() {
     _recorder.dispose();
     super.onClose();
+  }
+
+  static bool _isFirestoreSpam(Map<String, dynamic> data) {
+    final Object? v = data['spam_status'];
+    if (v is! String) {
+      return false;
+    }
+    return v.toLowerCase().trim() == 'spam';
+  }
+
+  /// Same field as [SpamController] — user chose to remove; hide in chat and spam list.
+  static bool _isUserRemovedMessage(Map<String, dynamic> data) {
+    final Object? v = data['deleted_from_spam'];
+    if (v is bool) {
+      return v;
+    }
+    if (v is int) {
+      return v != 0;
+    }
+    return false;
   }
 
   void initializeWithChat(ChatModel chatModel) {
@@ -101,8 +125,13 @@ class MessageDetailController extends GetxController {
       .snapshots(includeMetadataChanges: true)
       .listen((snapshot) {
     final docs = snapshot.docs;
-    
-    final firestoreMessages = docs.map((doc) {
+
+    final firestoreMessages = docs
+        .where(
+          (QueryDocumentSnapshot<Map<String, dynamic>> doc) =>
+              !_isUserRemovedMessage(doc.data()),
+        )
+        .map((doc) {
       final data = doc.data();
       final String senderNumber = data['senderNumber'] ?? '';
       final String myNumber = authController.currentUser.value?.phoneNumber ?? '';
@@ -124,8 +153,10 @@ class MessageDetailController extends GetxController {
         isSent: senderNumber == myNumber,
         voiceDuration: data['duration'] ?? 0,
         status: MessageStatus.sent,
+        isSpam: _isFirestoreSpam(data),
       );
-    }).toList();
+    })
+        .toList();
 
     // --- FIXED MERGE LOGIC ---
     // Instead of checking IDs, we check if the CONTENT is already in the firestore list.
@@ -610,5 +641,63 @@ class MessageDetailController extends GetxController {
     final minute = dateTime.minute.toString().padLeft(2, '0');
     final period = dateTime.hour >= 12 ? 'PM' : 'AM';
     return '$hour:$minute $period';
+  }
+
+  bool isMessageSelected(String messageId) =>
+      selectedMessageIds.contains(messageId);
+
+  void onMessageLongPress(String messageId) {
+    if (!isSelectionMode.value) {
+      isSelectionMode.value = true;
+      selectedMessageIds.clear();
+      selectedMessageIds.add(messageId);
+    } else {
+      toggleMessageSelection(messageId);
+    }
+  }
+
+  void toggleMessageSelection(String messageId) {
+    if (!isSelectionMode.value) {
+      return;
+    }
+    if (selectedMessageIds.contains(messageId)) {
+      selectedMessageIds.remove(messageId);
+    } else {
+      selectedMessageIds.add(messageId);
+    }
+    if (selectedMessageIds.isEmpty) {
+      isSelectionMode.value = false;
+    }
+  }
+
+  void exitSelectionMode() {
+    isSelectionMode.value = false;
+    selectedMessageIds.clear();
+  }
+
+  Future<void> deleteSelectedMessages() async {
+    final String? chatId = chat.value?.id;
+    if (chatId == null || selectedMessageIds.isEmpty) {
+      return;
+    }
+    final List<String> ids = List<String>.from(selectedMessageIds);
+    exitSelectionMode();
+    try {
+      for (final String id in ids) {
+        if (id.startsWith('temp_')) {
+          messages.removeWhere((MessageModel m) => m.id == id);
+          continue;
+        }
+        await _firestore
+            .collection('chats')
+            .doc(chatId)
+            .collection('messages')
+            .doc(id)
+            .delete();
+      }
+      _saveLocalFailedMessages();
+    } catch (e) {
+      Get.snackbar('Could not delete', e.toString());
+    }
   }
 }

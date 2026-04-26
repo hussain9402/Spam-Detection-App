@@ -5,7 +5,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';class ContactModel {
+import 'package:get_storage/get_storage.dart';
+
+class ContactModel {
   final Contact contact;
   final bool isAppUser;
   final String phoneNumber;

@@ -1,23 +1,110 @@
 import 'package:flutter/material.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_instance/src/extension_instance.dart';
-import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:get/get.dart';
 import 'package:spamdetection/core/constants/app_colors.dart';
 import 'package:spamdetection/core/localization/app_localizations.dart';
-import 'package:spamdetection/core/routes/app_routes.dart';
-import 'package:spamdetection/features/authentication/controllers/auth_controller.dart';
 import 'package:spamdetection/features/chat/controllers/call_controller.dart';
+import 'package:spamdetection/features/chat/controllers/message_detail_controller.dart';
+import 'package:spamdetection/features/chat/controllers/navigation_controller.dart';
 import 'package:spamdetection/features/chat/models/chat_model.dart';
 import 'package:spamdetection/features/chat/views/calls/Call_UI.dart';
 import 'package:spamdetection/features/chat/views/chat_detail/ChatInfoScreen.dart';
 
 class ChatHeader extends StatelessWidget {
   final ChatModel chat;
+  final MessageDetailController controller;
 
-  const ChatHeader({super.key, required this.chat});
+  const ChatHeader({
+    super.key,
+    required this.chat,
+    required this.controller,
+  });
 
   @override
   Widget build(BuildContext context) {
+    return Obx(() {
+      if (controller.isSelectionMode.value) {
+        return _buildSelectionBar(context);
+      }
+      return _buildNormalBar(context);
+    });
+  }
+
+  Widget _buildSelectionBar(BuildContext context) {
+    final int n = controller.selectedMessageIds.length;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      decoration: BoxDecoration(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        border: Border(
+          bottom: BorderSide(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? AppColors.borderDark
+                : AppColors.borderGray,
+            width: 1,
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.close),
+            onPressed: () => controller.exitSelectionMode(),
+            tooltip: 'Cancel',
+          ),
+          Expanded(
+            child: Text(
+              n == 1 ? '1 selected' : '$n selected',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+            tooltip: 'Delete',
+            onPressed: () => _confirmDeleteSelected(context),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _confirmDeleteSelected(BuildContext context) async {
+    final int n = controller.selectedMessageIds.length;
+    if (n == 0) {
+      return;
+    }
+    final bool? ok = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext ctx) {
+        return AlertDialog(
+          title: const Text('Delete messages?'),
+          content: Text(
+            n == 1
+                ? 'This message will be permanently removed for everyone in the chat.'
+                : 'Delete $n messages? They will be permanently removed for everyone in the chat.',
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(true),
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+    if (ok == true) {
+      await controller.deleteSelectedMessages();
+    }
+  }
+
+  Widget _buildNormalBar(BuildContext context) {
     final AppLocalizations localizations = AppLocalizations.of(context)!;
 
     return Container(
@@ -33,14 +120,17 @@ class ChatHeader extends StatelessWidget {
           ),
         ),
       ),
-      child: // Inside ChatHeader Widget build...
-      Row(
+      child: Row(
         children: [
           IconButton(
             icon: const Icon(Icons.arrow_back),
-            onPressed: () => Get.offAllNamed(AppRoutes.mainNavigation),
+            onPressed: () {
+              if (Get.isRegistered<NavigationController>()) {
+                Get.find<NavigationController>().goToMessagesTab();
+              }
+              Get.back();
+            },
           ),
-          // WRAP THIS IN GESTURE DETECTOR
           Expanded(
             child: GestureDetector(
               onTap: () => Get.to(() => ChatInfoScreen(chat: chat)),
@@ -54,41 +144,36 @@ class ChatHeader extends StatelessWidget {
               ),
             ),
           ),
-         IconButton(
-  icon: const Icon(Icons.phone),
-  onPressed: () async {
-    // 1️⃣ Get the CallController
-    final callController = Get.isRegistered<CallController>()
-        ? Get.find<CallController>()
-        : Get.put(CallController());
+          IconButton(
+            icon: const Icon(Icons.phone),
+            onPressed: () async {
+              final CallController callController = Get.isRegistered<CallController>()
+                  ? Get.find<CallController>()
+                  : Get.put(CallController());
 
-    // 2️⃣ Get caller and receiver info
-    final callerId = AuthController().cachedPhoneNumber; // your current user
-    final receiverId = chat.phoneNumber ?? '';
-    if (receiverId.isEmpty) return;
+              final String receiverId = chat.phoneNumber ?? '';
+              if (receiverId.isEmpty) {
+                return;
+              }
 
-    // 3️⃣ Generate a unique callId
-    final callId = DateTime.now().millisecondsSinceEpoch.toString();
+              final String callId =
+                  DateTime.now().millisecondsSinceEpoch.toString();
 
-    // 4️⃣ Create the call in Firestore
-    await callController.createCall(
-      receiverId: receiverId,
-      isVideo: false,
-    );
+              await callController.createCall(
+                receiverId: receiverId,
+                isVideo: false,
+              );
 
-    // 5️⃣ Navigate to CallScreen as caller
-    Get.to(
-      () => CallScreen(
-        callId: callId,
-        channelId: 'call_$callId',
-        isVideo: false,
-        isCaller: true, // important for showing cancel button
-      ),
-    );
-  },
-),
-
-
+              Get.to(
+                () => CallScreen(
+                  callId: callId,
+                  channelId: 'call_$callId',
+                  isVideo: false,
+                  isCaller: true,
+                ),
+              );
+            },
+          ),
           IconButton(icon: const Icon(Icons.videocam), onPressed: () {}),
         ],
       ),
@@ -133,7 +218,7 @@ class ChatHeader extends StatelessWidget {
         children: [
           Text(
             chat.name,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
               color: AppColors.textWhite,

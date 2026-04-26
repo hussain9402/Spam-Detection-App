@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:spamdetection/core/routes/app_routes.dart';
 import '../../controllers/message_detail_controller.dart';
+import '../../controllers/navigation_controller.dart';
 import '../../models/chat_model.dart';
 import 'widgets/chat_header.dart';
 import 'widgets/chat_message_list.dart';
@@ -42,13 +42,19 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: false, // Prevents the default back behavior
-      onPopInvokedWithResult: (didPop, result) {
-        if (didPop) return;
-
-        // Forces the app to go to the Main Navigation (Messages)
-        // instead of back to the Contacts screen
-        Get.offAllNamed(AppRoutes.mainNavigation);
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, dynamic result) {
+        if (didPop) {
+          return;
+        }
+        if (controller.isSelectionMode.value) {
+          controller.exitSelectionMode();
+          return;
+        }
+        if (Get.isRegistered<NavigationController>()) {
+          Get.find<NavigationController>().goToMessagesTab();
+        }
+        Get.back();
       },
       child: Scaffold(
         // Keep background dynamic based on theme
@@ -56,13 +62,17 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
         body: SafeArea(
           child: Column(
             children: [
-              ChatHeader(chat: widget.chat),
+              ChatHeader(chat: widget.chat, controller: controller),
               Expanded(
                 // The Obx is inside ChatMessageList, so we don't need it here.
                 child: ChatMessageList(controller: controller),
               ),
-              // No Obx here! This keeps the input field focus stable.
-              ChatInputField(controller: controller),
+              Obx(() {
+                if (controller.isSelectionMode.value) {
+                  return const SizedBox.shrink();
+                }
+                return ChatInputField(controller: controller);
+              }),
             ],
           ),
         ),

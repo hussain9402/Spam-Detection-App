@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:spamdetection/core/constants/app_colors.dart';
 import 'package:spamdetection/features/chat/controllers/message_detail_controller.dart';
+import 'package:spamdetection/features/chat/controllers/navigation_controller.dart';
+import 'package:spamdetection/features/chat/controllers/spam_controller.dart';
 import 'package:spamdetection/features/chat/models/message_model.dart';
 
 class MessageBubble extends StatefulWidget {
@@ -75,124 +77,271 @@ class _MessageBubbleState extends State<MessageBubble> {
   }
 
   Widget _buildSentMessage(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            if (widget.message.status == MessageStatus.failed)
-              IconButton(
-                icon: const Icon(Icons.refresh, color: Colors.red, size: 20),
-                onPressed: () => widget.controller.resendMessage(widget.message),
-              ),
-            Flexible(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: widget.message.status == MessageStatus.failed
-                      ? Colors.red.withOpacity(0.2)
-                      : (Theme.of(context).brightness == Brightness.dark
-                          ? AppColors.primaryTeal.withAlpha(50)
-                          : AppColors.primaryTeal),
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(16),
-                    topRight: Radius.circular(16),
-                    bottomLeft: Radius.circular(16),
-                    bottomRight: Radius.circular(4),
-                  ),
-                ),
-                child: _buildMessageContent(
-                  context,
-                  textColor: AppColors.textWhite,
-                  isSent: true,
-                ),
-              ),
-            ),
-          ],
-        ),
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              widget.controller.formatTime(widget.message.timestamp),
-              style: const TextStyle(fontSize: 11, color: AppColors.textLightGray),
-            ),
-            const SizedBox(width: 4),
-            if (widget.message.status == MessageStatus.sending)
-              const SizedBox(
-                width: 10,
-                height: 10,
-                child: CircularProgressIndicator(strokeWidth: 1, color: AppColors.textLightGray),
-              )
-            else if (widget.message.status == MessageStatus.failed)
-              const Icon(Icons.error_outline, color: Colors.red, size: 12)
-            else
-              const Icon(Icons.done_all, color: AppColors.primaryTeal, size: 12),
-          ],
-        ),
-        const SizedBox(height: 4),
-      ],
-    );
-  }
+    return Obx(() {
+      final bool mode = widget.controller.isSelectionMode.value;
+      final bool sel =
+          widget.controller.selectedMessageIds.contains(widget.message.id);
 
-  Widget _buildReceivedMessage(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        CircleAvatar(
-          radius: 16,
-          backgroundColor: Colors.yellow[700],
-          child: const Icon(Icons.person, color: AppColors.textWhite, size: 20),
-        ),
-        const SizedBox(width: 8),
-        Flexible(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text(
-                widget.message.senderName,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.onSurface,
+              if (widget.message.status == MessageStatus.failed && !mode)
+                IconButton(
+                  icon: const Icon(Icons.refresh, color: Colors.red, size: 20),
+                  onPressed: () =>
+                      widget.controller.resendMessage(widget.message),
                 ),
-              ),
-              const SizedBox(height: 4),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? AppColors.backgroundDarkSurface.withOpacity(0.5)
-                      : AppColors.backgroundLightGray,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(4),
-                    topRight: Radius.circular(16),
-                    bottomLeft: Radius.circular(16),
-                    bottomRight: Radius.circular(16),
+              Flexible(
+                child: GestureDetector(
+                  onLongPress: () =>
+                      widget.controller.onMessageLongPress(widget.message.id),
+                  onTap: mode
+                      ? () => widget.controller
+                          .toggleMessageSelection(widget.message.id)
+                      : null,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: widget.message.status == MessageStatus.failed
+                          ? Colors.red.withOpacity(0.2)
+                          : (Theme.of(context).brightness == Brightness.dark
+                              ? AppColors.primaryTeal.withAlpha(50)
+                              : AppColors.primaryTeal),
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(16),
+                        topRight: Radius.circular(16),
+                        bottomLeft: Radius.circular(16),
+                        bottomRight: Radius.circular(4),
+                      ),
+                      border: mode && sel
+                          ? Border.all(
+                              color: AppColors.primaryTeal,
+                              width: 2,
+                            )
+                          : null,
+                    ),
+                    child: AbsorbPointer(
+                      absorbing: mode,
+                      child: _buildMessageBody(
+                        context,
+                        textColor: AppColors.textWhite,
+                        isSent: true,
+                      ),
+                    ),
                   ),
                 ),
-                child: _buildMessageContent(
-                  context,
-                  textColor: Theme.of(context).colorScheme.onSurface,
-                  isSent: false,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                widget.controller.formatTime(widget.message.timestamp),
-                style: const TextStyle(fontSize: 11, color: AppColors.textLightGray),
               ),
             ],
           ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                widget.controller.formatTime(widget.message.timestamp),
+                style: const TextStyle(
+                  fontSize: 11,
+                  color: AppColors.textLightGray,
+                ),
+              ),
+              const SizedBox(width: 4),
+              if (widget.message.status == MessageStatus.sending)
+                const SizedBox(
+                  width: 10,
+                  height: 10,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 1,
+                    color: AppColors.textLightGray,
+                  ),
+                )
+              else if (widget.message.status == MessageStatus.failed)
+                const Icon(Icons.error_outline, color: Colors.red, size: 12)
+              else
+                const Icon(Icons.done_all,
+                    color: AppColors.primaryTeal, size: 12),
+            ],
+          ),
+          const SizedBox(height: 4),
+        ],
+      );
+    });
+  }
+
+  Widget _buildReceivedMessage(BuildContext context) {
+    return Obx(() {
+      final bool mode = widget.controller.isSelectionMode.value;
+      final bool sel =
+          widget.controller.selectedMessageIds.contains(widget.message.id);
+
+      return GestureDetector(
+        onLongPress: () =>
+            widget.controller.onMessageLongPress(widget.message.id),
+        onTap: mode
+            ? () =>
+                widget.controller.toggleMessageSelection(widget.message.id)
+            : null,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CircleAvatar(
+              radius: 16,
+              backgroundColor: Colors.yellow[700],
+              child: const Icon(Icons.person,
+                  color: AppColors.textWhite, size: 20),
+            ),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.message.senderName,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? AppColors.backgroundDarkSurface.withOpacity(0.5)
+                          : AppColors.backgroundLightGray,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(4),
+                        topRight: Radius.circular(16),
+                        bottomLeft: Radius.circular(16),
+                        bottomRight: Radius.circular(16),
+                      ),
+                      border: mode && sel
+                          ? Border.all(
+                              color: AppColors.primaryTeal,
+                              width: 2,
+                            )
+                          : null,
+                    ),
+                    child: AbsorbPointer(
+                      absorbing: mode,
+                      child: _buildMessageBody(
+                        context,
+                        textColor:
+                            Theme.of(context).colorScheme.onSurface,
+                        isSent: false,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    widget.controller.formatTime(widget.message.timestamp),
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: AppColors.textLightGray,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
-      ],
-    );
+      );
+    });
   }
 
   static const double _imageMaxSide = 220;
+
+  Widget _buildMessageBody(
+    BuildContext context, {
+    required Color textColor,
+    required bool isSent,
+  }) {
+    if (widget.message.isSpam) {
+      return _buildSpamPlaceholder(context, textColor: textColor, isSent: isSent);
+    }
+    return _buildMessageContent(
+      context,
+      textColor: textColor,
+      isSent: isSent,
+    );
+  }
+
+  void _goToSpamScreen() {
+    final String? chatId = widget.controller.chat.value?.id;
+    if (chatId != null && chatId.isNotEmpty) {
+      final SpamController spam = Get.isRegistered<SpamController>()
+          ? Get.find<SpamController>()
+          : Get.put(SpamController(), permanent: true);
+      spam.setHighlightedMessageFromChat(chatId, widget.message.id);
+    }
+    Get.back();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (Get.isRegistered<NavigationController>()) {
+        Get.find<NavigationController>().changeTab(1);
+      }
+    });
+  }
+
+  /// Tap opens Spam tab; full text is only on the Spam screen
+  Widget _buildSpamPlaceholder(
+    BuildContext context, {
+    required Color textColor,
+    required bool isSent,
+  }) {
+    return Obx(() {
+      final bool mode = widget.controller.isSelectionMode.value;
+      final bool sel =
+          widget.controller.selectedMessageIds.contains(widget.message.id);
+
+      return Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: mode ? () => widget.controller.toggleMessageSelection(widget.message.id) : _goToSpamScreen,
+          onLongPress: () =>
+              widget.controller.onMessageLongPress(widget.message.id),
+          borderRadius: BorderRadius.circular(8),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              border: mode && sel
+                  ? Border.all(color: AppColors.primaryTeal, width: 2)
+                  : null,
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 2),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.gpp_bad_outlined,
+                  size: 20,
+                  color: textColor,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Spam',
+                  style: TextStyle(
+                    color: textColor,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    });
+  }
 
   Widget _buildMessageContent(
     BuildContext context, {

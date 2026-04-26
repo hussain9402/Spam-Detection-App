@@ -7,6 +7,8 @@ class ChatModel {
   final String? senderPhone;  // You
   final int unreadCount;
   final bool isGroup;
+  /// Firestore `otherUserName` (often the other person\'s profile) — we prefer your contact name when resolvable
+  final String? firestoreOtherName;
 
   ChatModel({
     required this.id,
@@ -17,5 +19,6 @@ class ChatModel {
     this.senderPhone,
     this.unreadCount = 0,
     this.isGroup = false,
+    this.firestoreOtherName,
   });
 }

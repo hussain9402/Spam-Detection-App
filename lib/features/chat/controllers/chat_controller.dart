@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+import 'package:spamdetection/core/utils/contact_display_name.dart';
 import 'package:spamdetection/features/authentication/controllers/auth_controller.dart';
+import 'package:spamdetection/shared/services/contacts_service.dart';
 import '../models/chat_model.dart';
 
 class ChatController extends GetxController {
@@ -11,22 +13,84 @@ class ChatController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    
+
+    if (!Get.isRegistered<ContactsController>()) {
+      Get.put(ContactsController(), permanent: true);
+    }
+    final ContactsController cc = Get.find<ContactsController>();
+    ever<bool>(
+      cc.isLoading,
+      (bool busy) {
+        if (!busy) {
+          _reapplyDisplayNamesFromContacts();
+        }
+      },
+    );
+    ever<List<ContactModel>>(
+      cc.contacts,
+      (List<ContactModel> _) => _reapplyDisplayNamesFromContacts(),
+    );
+
     // 1. Try to load immediately if user is already available
     listenToMyChats();
 
-    // 2. Also re-trigger if the current user changes (e.g., after login or splash fetch)
+    // 2. Also re-trigger if the current user changes (e.g. after login or splash fetch)
     ever(Get.find<AuthController>().currentUser, (user) {
       print("DEBUG: currentUser changed: ${user?.phoneNumber}");
-      if (user != null && user.phoneNumber.isNotEmpty) {
+      if (user != null &&
+          (user.phoneNumber.isNotEmpty ||
+              Get.find<AuthController>().cachedPhoneNumber.isNotEmpty)) {
         listenToMyChats();
       }
     });
   }
 
+  void _reapplyDisplayNamesFromContacts() {
+    if (chats.isEmpty) {
+      return;
+    }
+    final List<ChatModel> next = <ChatModel>[];
+    for (final ChatModel c in chats) {
+      final String? p = c.phoneNumber;
+      if (p == null || p.isEmpty) {
+        next.add(c);
+        continue;
+      }
+      final String title = ContactDisplayName.chatListTitle(
+        otherPhone: p,
+        fromFirestore: c.firestoreOtherName,
+      );
+      if (title == c.name) {
+        next.add(c);
+        continue;
+      }
+      next.add(
+        ChatModel(
+          id: c.id,
+          name: title,
+          lastMessage: c.lastMessage,
+          lastMessageTime: c.lastMessageTime,
+          phoneNumber: c.phoneNumber,
+          senderPhone: c.senderPhone,
+          unreadCount: c.unreadCount,
+          isGroup: c.isGroup,
+          firestoreOtherName: c.firestoreOtherName,
+        ),
+      );
+    }
+    chats.assignAll(next);
+  }
+
   void listenToMyChats() {
-    // 1. Get your number from the AuthController
-    final String? myNumber = Get.find<AuthController>().currentUser.value?.phoneNumber;
+    // 1. Get your number from the AuthController (match SpamController / sign-in flow)
+    final AuthController auth = Get.find<AuthController>();
+    String? myNumber = auth.currentUser.value?.phoneNumber;
+    if (myNumber == null || myNumber.isEmpty) {
+      final String cache = auth.cachedPhoneNumber.trim();
+      if (cache.isNotEmpty) {
+        myNumber = cache;
+      }
+    }
 
     print("DEBUG: listenToMyChats called. myNumber: '$myNumber'");
 
@@ -35,12 +99,14 @@ class ChatController extends GetxController {
       return;
     }
 
+    final String me = myNumber;
+
     isLoading.value = true;
 
     // 2. Listen to the 'chats' collection where you are a participant
     _firestore
         .collection('chats')
-        .where('participants', arrayContains: myNumber)
+        .where('participants', arrayContains: me)
         .snapshots()
         .listen((snapshot) {
       print("DEBUG: Received snapshot with ${snapshot.docs.length} chats");
@@ -48,25 +114,51 @@ class ChatController extends GetxController {
       final List<ChatModel> fetchedChats = snapshot.docs.map((doc) {
         final data = doc.data();
         
-        // Find the other person's number
-        List participants = data['participants'] ?? [];
-        String otherPhone = participants.firstWhere(
-          (phone) => phone != myNumber,
-          orElse: () => "Unknown",
-        );
+        // Find the other person\'s number (use digit-aware match, not string !=)
+        final List<dynamic> participants = data['participants'] is List
+            ? (data['participants'] as List<dynamic>)
+            : <dynamic>[];
+        String otherPhone = 'Unknown';
+        for (final dynamic raw in participants) {
+          final String s = raw.toString().trim();
+          if (s.isEmpty) {
+            continue;
+          }
+          if (!ContactDisplayName.phonesMatch(s, me)) {
+            otherPhone = s;
+            break;
+          }
+        }
+        if (otherPhone == 'Unknown' && participants.length == 2) {
+          otherPhone = ContactDisplayName.phonesMatch(
+                participants[0].toString().trim(),
+                me,
+              )
+              ? participants[1].toString().trim()
+              : participants[0].toString().trim();
+        }
+
+        final String? firestoreName =
+            (data['otherUserName'] as String?)?.trim().isNotEmpty == true
+                ? (data['otherUserName'] as String?)
+                : null;
 
         final lastMsg = data['lastMessage'] ?? '';
         print("DEBUG: Chat ${doc.id} lastMessage: '$lastMsg'");
 
         return ChatModel(
           id: doc.id,
-          // Fallback to phone number if profile name isn't set yet
-          name: data['otherUserName'] ?? otherPhone, 
+          name: ContactDisplayName.chatListTitle(
+            otherPhone: otherPhone,
+            fromFirestore: firestoreName,
+          ),
           lastMessage: lastMsg,
-          lastMessageTime: (data['lastMessageTime'] as Timestamp?)?.toDate() ?? DateTime.now(),
+          lastMessageTime: (data['lastMessageTime'] as Timestamp?)?.toDate() ??
+              DateTime.now(),
           phoneNumber: otherPhone,
-          senderPhone: myNumber,
+          senderPhone: me,
           unreadCount: data['unreadCount'] ?? 0,
+          firestoreOtherName: data['otherUserName'] as String?,
         );
       }).toList();
 

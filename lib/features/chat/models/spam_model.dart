@@ -30,8 +30,30 @@ extension SpamRiskLevelExtension on SpamRiskLevel {
   }
 }
 
+/// One row on the main Spam tab: all spam in a single chat aggregated.
+class SpamChatSummary {
+  final String chatId;
+  final String displayTitle;
+  final String? subtitlePhone;
+  final int spamMessageCount;
+  final String lastPreview;
+  final DateTime lastSpamAt;
+
+  const SpamChatSummary({
+    required this.chatId,
+    required this.displayTitle,
+    this.subtitlePhone,
+    required this.spamMessageCount,
+    required this.lastPreview,
+    required this.lastSpamAt,
+  });
+}
+
 class SpamMessage {
   final String id;
+  /// For Firestore `chats/{chatId}/messages/{messageId}` updates (soft delete, etc.)
+  final String chatId;
+  final String messageId;
   final String senderName;
   final String senderPhone;
   final String? senderImage;
@@ -43,6 +65,8 @@ class SpamMessage {
 
   SpamMessage({
     required this.id,
+    required this.chatId,
+    required this.messageId,
     required this.senderName,
     required this.senderPhone,
     this.senderImage,

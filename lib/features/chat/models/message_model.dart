@@ -22,6 +22,8 @@ class MessageModel {
   final int? voiceDuration; // in seconds, for voice messages
   final MessageStatus status;
   final String? localPath; // For resending failed messages
+  /// From Firestore [spam_status] — when true, the chat thread shows a "Spam" chip instead of content
+  final bool isSpam;
 
   MessageModel({
     required this.id,
@@ -35,12 +37,14 @@ class MessageModel {
     this.voiceDuration,
     this.status = MessageStatus.sent,
     this.localPath,
+    this.isSpam = false,
   });
 
   MessageModel copyWith({
     String? id,
     MessageStatus? status,
     String? content,
+    bool? isSpam,
   }) {
     return MessageModel(
       id: id ?? this.id,
@@ -54,6 +58,7 @@ class MessageModel {
       voiceDuration: voiceDuration,
       status: status ?? this.status,
       localPath: localPath,
+      isSpam: isSpam ?? this.isSpam,
     );
   }
 }
